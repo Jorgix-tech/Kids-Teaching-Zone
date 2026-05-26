@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⭐ Reading Stars — English Practice</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap');
+
+  :root {
+    --sky: #e8f4ff;
+    --star1: #ffd700;
+    --star2: #ff9f43;
+    --green: #26de81;
+    --red: #fc5c65;
+    --blue: #4a90d9;
+    --purple: #a55eea;
+    --pink: #fd9644;
+    --dark: #2d3561;
+    --card: #ffffff;
+    --shadow: 0 8px 32px rgba(45,53,97,0.13);
+    --radius: 20px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #e8f4ff 0%, #fef9ec 50%, #f0f8ff 100%);
+    min-height: 100vh;
+    color: var(--dark);
+    overflow-x: hidden;
+  }
+
+  /* Floating stars background */
+  .bg-stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: hidden; }
+  .bg-star {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0.15;
+    animation: floatStar linear infinite;
+  }
+  @keyframes floatStar {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.15; }
+    90% { opacity: 0.15; }
+    100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+  }
+
+  /* Header */
+  header {
+    position: relative; z-index: 10;
+    text-align: center;
+    padding: 32px 20px 16px;
+  }
+  header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2rem, 6vw, 3.5rem);
+    color: var(--dark);
+    text-shadow: 3px 3px 0 rgba(74,144,217,0.2);
+    letter-spacing: 1px;
+  }
+  header h1 span { color: var(--blue); }
+  header p { font-size: 1rem; color: #6b7db3; margin-top: 6px; font-weight: 600; }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 20px;
+    position: relative; z-index: 10;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    border: 3px solid transparent;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.25s;
+    background: white;
+    color: var(--dark);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
+  .tab-btn.active { color: white; transform: translateY(-2px); }
+  .tab-btn[data-tab="letters"].active { background: var(--purple); border-color: var(--purple); }
+  .tab-btn[data-tab="vocab"].active { background: var(--blue); border-color: var(--blue); }
+  .tab-btn[data-tab="sentences"].active { background: var(--green); border-color: var(--green); color: var(--dark); }
+  .tab-btn[data-tab="decode"].active { background: var(--star2); border-color: var(--star2); }
+  .tab-btn[data-tab="test"].active { background: var(--red); border-color: var(--red); }
+
+  /* Main content */
+  main { position: relative; z-index: 10; padding: 10px 20px 40px; max-width: 900px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ===== LETTERS SECTION ===== */
+  .alphabet-row {
+    display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+    margin-bottom: 24px;
+  }
+  .letter-card {
+    width: 64px; height: 80px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .letter-card:hover { transform: translateY(-4px) scale(1.08); box-shadow: 0 12px 28px rgba(0,0,0,0.15); }
+  .letter-card.selected { border-color: var(--purple); background: #f5eeff; }
+  .letter-card .upper { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: var(--dark); line-height: 1; }
+  .letter-card .lower { font-family: 'Fredoka One', cursive; font-size: 1.2rem; color: var(--blue); }
+
+  .letter-detail {
+    background: white;
+    border-radius: var(--radius);
+    padding: 28px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    min-height: 140px;
+    animation: popIn 0.3s ease;
+  }
+  @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .letter-detail .big-letter {
+    font-family: 'Fredoka One', cursive;
+    font-size: 5rem;
+    color: var(--purple);
+    line-height: 1;
+  }
+  .letter-detail .words-row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 14px; }
+  .word-pill {
+    background: var(--sky);
+    border-radius: 50px;
+    padding: 6px 16px;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--dark);
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+  }
+  .word-pill:hover { background: var(--purple); color: white; transform: scale(1.05); }
+  .word-pill .highlight { color: var(--red); font-weight: 900; }
+
+  /* ===== VOCAB SECTION ===== */
+  .vocab-controls { display: flex; gap: 10px; margin-bottom: 18px; flex-wrap: wrap; justify-content: center; }
+  .vocab-filter {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid #dce3f5;
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+  .vocab-filter.active { background: var(--blue); color: white; border-color: var(--blue); }
+  .vocab-search {
+    padding: 8px 18px;
+    border-radius: 50px;
+    border: 2px solid #dce3f5;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    outline: none;
+    transition: all 0.2s;
+    width: 160px;
+  }
+  .vocab-search:focus { border-color: var(--blue); }
+
+  .vocab-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .vocab-card {
+    background: white;
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.22s;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+  .vocab-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--blue), var(--purple));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .vocab-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  .vocab-card:hover::before { opacity: 1; }
+  .vocab-card.flipped { background: linear-gradient(135deg, #4a90d9, #a55eea); color: white; }
+  .vocab-card .word-en { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--dark); }
+  .vocab-card.flipped .word-en { color: white; }
+  .vocab-card .word-he { font-size: 1.1rem; font-weight: 700; color: var(--blue); margin-top: 2px; direction: rtl; }
+  .vocab-card.flipped .word-he { color: rgba(255,255,255,0.85); }
+  .vocab-card .example { font-size: 0.8rem; color: #8899cc; margin-top: 6px; font-style: italic; }
+  .vocab-card.flipped .example { color: rgba(255,255,255,0.7); }
+  .vocab-card .flip-hint { font-size: 0.75rem; color: #b0bbdd; margin-top: 8px; }
+  .vocab-card.flipped .flip-hint { color: rgba(255,255,255,0.5); }
+
+  /* ===== SENTENCES SECTION ===== */
+  .level-tabs { display: flex; gap: 8px; margin-bottom: 18px; justify-content: center; }
+  .level-btn {
+    padding: 8px 20px; border-radius: 50px; border: 2px solid #dce3f5;
+    background: white; font-family: 'Nunito', sans-serif;
+    font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .level-btn.active { background: var(--green); color: var(--dark); border-color: var(--green); }
+
+  .sentence-card {
+    background: white;
+    border-radius: 18px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+  .sentence-card:hover { transform: translateX(4px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .sentence-card.correct { border-left: 5px solid var(--green); background: #f0fff7; }
+  .sentence-card.wrong { border-left: 5px solid var(--red); background: #fff0f1; }
+  .sentence-num {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--sky); color: var(--blue);
+    font-weight: 900; font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .sentence-text { flex: 1; font-size: 1.05rem; font-weight: 600; }
+  .sentence-actions { display: flex; gap: 8px; }
+  .speak-btn, .mark-btn {
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    cursor: pointer; font-size: 1rem; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .speak-btn { background: var(--sky); color: var(--blue); }
+  .speak-btn:hover { background: var(--blue); color: white; transform: scale(1.1); }
+  .mark-btn.correct { background: #d4fae8; color: #26de81; }
+  .mark-btn.wrong { background: #ffd8da; color: #fc5c65; }
+  .mark-btn:not(.correct):not(.wrong) { background: #f0f2f8; color: #aab0cc; }
+  .mark-btn:hover { transform: scale(1.1); }
+
+  .progress-bar-wrap { background: #edf0f8; border-radius: 50px; height: 10px; margin-bottom: 20px; overflow: hidden; }
+  .progress-bar { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--green), var(--blue)); transition: width 0.5s; }
+
+  /* ===== DECODE SECTION ===== */
+  .decode-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
+  .decode-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px 14px;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    cursor: pointer;
+    transition: all 0.22s;
+    border: 3px solid transparent;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    color: var(--dark);
+    position: relative;
+    overflow: hidden;
+  }
+  .decode-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.13); border-color: var(--star2); }
+  .decode-card.speaking { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); border-color: var(--star2); }
+  .decode-card .phonics-tag { font-family: 'Nunito', sans-serif; font-size: 0.7rem; font-weight: 700; color: #aab0cc; display: block; margin-top: 4px; }
+  .decode-section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--star2);
+    margin: 20px 0 10px;
+    text-align: center;
+  }
+
+  /* ===== TEST SECTION ===== */
+  .test-card {
+    background: white;
+    border-radius: var(--radius);
+    padding: 32px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    min-height: 260px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .test-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(135deg, #f8f9ff, #fff8f0);
+    z-index: 0;
+  }
+  .test-card > * { position: relative; z-index: 1; }
+  .test-word {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    color: var(--dark);
+    letter-spacing: 2px;
+  }
+  .test-options { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .test-option {
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: 3px solid #dce3f5;
+    background: white;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    direction: rtl;
+    min-width: 110px;
+    text-align: center;
+  }
+  .test-option:hover { border-color: var(--blue); background: var(--sky); transform: scale(1.03); }
+  .test-option.correct { background: #d4fae8; border-color: var(--green); color: var(--dark); }
+  .test-option.wrong { background: #ffd8da; border-color: var(--red); color: var(--dark); }
+  .test-feedback { font-size: 2rem; animation: popIn 0.3s; }
+  .test-nav { display: flex; gap: 14px; justify-content: center; margin-top: 14px; }
+  .nav-btn {
+    padding: 12px 28px;
+    border-radius: 50px;
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.22s;
+  }
+  .nav-btn.primary { background: var(--blue); color: white; box-shadow: 0 4px 14px rgba(74,144,217,0.4); }
+  .nav-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(74,144,217,0.5); }
+  .nav-btn.secondary { background: #edf0f8; color: var(--dark); }
+  .nav-btn.secondary:hover { background: #dce3f5; }
+
+  .score-display {
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    border-radius: var(--radius);
+    padding: 24px;
+    color: white;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+  .score-display .score-num { font-family: 'Fredoka One', cursive; font-size: 3rem; }
+  .score-display p { opacity: 0.85; font-weight: 600; }
+
+  .test-type-selector { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .test-type-btn {
+    padding: 10px 20px; border-radius: 50px; border: 2px solid #dce3f5;
+    background: white; font-family: 'Nunito', sans-serif;
+    font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: all 0.2s;
+  }
+  .test-type-btn.active { background: var(--red); color: white; border-color: var(--red); }
+
+  /* Alphabet strip */
+  .alpha-strip {
+    background: white;
+    border-radius: 14px;
+    padding: 10px 16px;
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: var(--dark);
+    letter-spacing: 3px;
+    margin-bottom: 18px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    line-height: 2;
+  }
+  .alpha-strip span { color: var(--blue); }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .vocab-grid { grid-template-columns: 1fr 1fr; }
+    .decode-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: var(--dark); color: white; padding: 12px 28px;
+    border-radius: 50px; font-weight: 700; font-size: 0.95rem;
+    z-index: 999; transition: transform 0.35s;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.2);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Speak animation */
+  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+  .pulsing { animation: pulse 0.5s ease infinite; }
+</style>
+</head>
+<body>
+
+<!-- Floating background stars -->
+<div class="bg-stars" id="bgStars"></div>
+
+<header>
+  <h1>⭐ Reading <span>Stars</span></h1>
+  <p>מבדק קריאה — סוף כיתה ג׳ | לחצי על כל דבר לשמוע!</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="letters">🔤 אותיות</button>
+  <button class="tab-btn" data-tab="vocab">📖 מילון</button>
+  <button class="tab-btn" data-tab="sentences">📝 משפטים</button>
+  <button class="tab-btn" data-tab="decode">⚡ Quick Decode</button>
+  <button class="tab-btn" data-tab="test">🎯 בחן את עצמי</button>
+</div>
+
+<main>
+
+  <!-- ===== LETTERS ===== -->
+  <section class="section active" id="sec-letters">
+    <div class="alpha-strip">
+      <span>A B C D E F G H I J K L M N O P Q R S T U V W X Y Z</span><br>
+      a b c d e f g h i j k l m n o p q r s t u v w x y z
+    </div>
+    <div class="alphabet-row" id="letterGrid"></div>
+    <div class="letter-detail" id="letterDetail">
+      <p style="color:#aab0cc; font-weight:600;">👆 לחצי על אות כדי לראות ולשמוע מילים</p>
+    </div>
+  </section>
+
+  <!-- ===== VOCAB ===== -->
+  <section class="section" id="sec-vocab">
+    <div class="vocab-controls">
+      <button class="vocab-filter active" data-filter="all">כל המילים</button>
+      <button class="vocab-filter" data-filter="nouns">שמות עצם</button>
+      <button class="vocab-filter" data-filter="adj">תארים</button>
+      <button class="vocab-filter" data-filter="other">אחר</button>
+      <input class="vocab-search" id="vocabSearch" type="text" placeholder="🔍 חיפוש...">
+    </div>
+    <div class="vocab-grid" id="vocabGrid"></div>
+    <p style="text-align:center; color:#aab0cc; font-size:0.85rem; margin-top:12px;">💡 לחצי על כרטיסייה לתרגום | 🔊 לחצי שוב לשמוע</p>
+  </section>
+
+  <!-- ===== SENTENCES ===== -->
+  <section class="section" id="sec-sentences">
+    <div class="level-tabs">
+      <button class="level-btn active" data-level="1">⭐ Level 1</button>
+      <button class="level-btn" data-level="2">⭐⭐ Level 2</button>
+      <button class="level-btn" data-level="3">⭐⭐⭐ Level 3</button>
+    </div>
+    <div class="progress-bar-wrap"><div class="progress-bar" id="sentProgress" style="width:0%"></div></div>
+    <div id="sentenceList"></div>
+    <div style="text-align:center; margin-top:16px;">
+      <button class="nav-btn secondary" onclick="resetSentences()">🔄 איפוס</button>
+    </div>
+  </section>
+
+  <!-- ===== DECODE ===== -->
+  <section class="section" id="sec-decode">
+    <p style="text-align:center; color:#6b7db3; font-weight:600; margin-bottom:16px;">⚡ לחצי על כל מילה לשמוע אותה — תרגול קריאה מהירה!</p>
+    <div id="decodeContent"></div>
+  </section>
+
+  <!-- ===== TEST ===== -->
+  <section class="section" id="sec-test">
+    <div class="score-display" id="scoreDisplay">
+      <div class="score-num" id="scoreNum">0 / 0</div>
+      <p>נקודות</p>
+    </div>
+    <div class="test-type-selector">
+      <button class="test-type-btn active" data-type="he2en">עברית ← אנגלית</button>
+      <button class="test-type-btn" data-type="en2he">אנגלית ← עברית</button>
+      <button class="test-type-btn" data-type="listen">🔊 שמיעה</button>
+    </div>
+    <div class="test-card" id="testCard">
+      <p style="color:#aab0cc; font-weight:600;">לחצי "התחלה" לבחינה!</p>
+    </div>
+    <div class="test-nav">
+      <button class="nav-btn secondary" onclick="skipTest()">⏭ דלגי</button>
+      <button class="nav-btn primary" onclick="startTest()">🎯 התחלה</button>
+    </div>
+  </section>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== DATA =====
+const VOCAB = [
+  { word:"bag", he:"תיק", ex:"He has a bag.", type:"nouns" },
+  { word:"ball", he:"כדור", ex:"She has a ball.", type:"nouns" },
+  { word:"bed", he:"מיטה", ex:"Tom is in a bed.", type:"nouns" },
+  { word:"big", he:"גדול/ה", ex:"He is big.", type:"adj" },
+  { word:"black", he:"שחור", ex:"The cat is black.", type:"adj" },
+  { word:"box", he:"קופסה", ex:"She has a box.", type:"nouns" },
+  { word:"boy", he:"ילד", ex:"Dan is a boy.", type:"nouns" },
+  { word:"carrot", he:"גזר", ex:"She has a carrot.", type:"nouns" },
+  { word:"cat", he:"חתול", ex:"Ned is a cat.", type:"nouns" },
+  { word:"desk", he:"שולחן", ex:"The pen is on the desk.", type:"nouns" },
+  { word:"dog", he:"כלב", ex:"Tess is a dog.", type:"nouns" },
+  { word:"eggs", he:"ביצים", ex:"She has ten eggs.", type:"nouns" },
+  { word:"fast", he:"מהיר/ה", ex:"She is fast.", type:"adj" },
+  { word:"fun", he:"כיף", ex:"It is fun.", type:"adj" },
+  { word:"hat", he:"כובע", ex:"He has a hat.", type:"nouns" },
+  { word:"hen", he:"תרנגולת", ex:"Pat is a hen.", type:"nouns" },
+  { word:"kid", he:"ילד/ה", ex:"Jack is a kid.", type:"nouns" },
+  { word:"lamp", he:"מנורה", ex:"He has a lamp.", type:"nouns" },
+  { word:"lemon", he:"לימון", ex:"Jan has a lemon.", type:"nouns" },
+  { word:"long", he:"ארוך", ex:"The van is long.", type:"adj" },
+  { word:"mad", he:"כועס", ex:"He is mad.", type:"adj" },
+  { word:"man", he:"גבר", ex:"Gus is a man.", type:"nouns" },
+  { word:"mat", he:"מחצלת", ex:"The cat is on the mat.", type:"nouns" },
+  { word:"pen", he:"עט", ex:"Dan has a pen.", type:"nouns" },
+  { word:"pet", he:"חיית מחמד", ex:"She has a pet.", type:"nouns" },
+  { word:"rabbit", he:"ארנב", ex:"Red is a rabbit.", type:"nouns" },
+  { word:"red", he:"אדום", ex:"The van is red.", type:"adj" },
+  { word:"sad", he:"עצוב/ה", ex:"She is sad.", type:"adj" },
+  { word:"sitting", he:"יושב/ת", ex:"She is sitting.", type:"other" },
+  { word:"small", he:"קטן/ה", ex:"He is small.", type:"adj" },
+  { word:"tall", he:"גבוה", ex:"He is tall.", type:"adj" },
+  { word:"under", he:"מתחת ל-", ex:"The cat is under the van.", type:"other" },
+  { word:"van", he:"ואן", ex:"He has a van.", type:"nouns" },
+];
+
+const SENTENCES = {
+  1: [
+    "Ned is a cat.",
+    "He is big.",
+    "He has a hat.",
+    "Pat is a hen.",
+    "She is sad.",
+    "Jan has a lemon.",
+    "Dan has a pen.",
+    "Tom is in a bed.",
+    "Meg has ten eggs.",
+    "Ned is a big dog.",
+  ],
+  2: [
+    "Tom is a man. He has a hat and a dog.",
+    "Tess is a dog. She is big. She is sitting.",
+    "Jim has a lamp. Bill is a sad man.",
+    "Red is a rabbit. She is fast. She has a carrot.",
+    "Gus is a man. He is small. He has a pen and a lamp.",
+    "Kit is a cat. She is big. She has a ball and a box.",
+    "Dan is a boy. He has a cat. The cat is small.",
+    "Sid is a small dog. He is black. He has a red hat.",
+  ],
+  3: [
+    "Rex is a man. He has a van. The van is red. The cat is under the van.",
+    "Gus is a man. He is tall. He has a bag.",
+    "Ben is a man. He is mad. He has lemons.",
+    "Liz is a grandma. She is fast. She has a hat.",
+    "Jack is a kid. He is sad. He has a ball.",
+    "Deb is a kid. She has a pet. It is not a dog.",
+    "Meg is a kid. She has a pet. It is not a rabbit.",
+    "The pen is under the lamp. The cat is on the mat.",
+  ],
+};
+
+const DECODE = {
+  "Level 1 — CVC o": ["not","hot","dot","dog","mom","mob","mop","stop","mad","mat","man","men"],
+  "Level 2 — Blends & Digraphs": ["him","rim","Tim","swim","king","wing","sing","song","duck","buck","luck","black","zap","zip","trip","quiz","but","nut","cut","cat"],
+  "Level 3 — Consonant Clusters": ["six","mix","fix","box","van","man","plan","glad","rest","best","test","next","under","sister","desk","long"],
+};
+
+const LETTER_WORDS = {
+  A:["ant","apple","at"],B:["bag","ball","big"],C:["cat","carrot","cap"],
+  D:["dog","desk","dot"],E:["egg","end"],F:["fast","fun","fox"],
+  G:["glad","got","gus"],H:["hat","hen","him"],I:["in","it","itch"],
+  J:["Jan","Jim","Jack"],K:["kid","kit","king"],L:["lamp","lemon","long"],
+  M:["man","mat","mad"],N:["not","nut","Ned"],O:["on","ox"],
+  P:["pen","pet","plan"],Q:["quiz"],R:["red","rabbit","rest"],
+  S:["sad","small","stop","sitting"],T:["tall","Tim","test"],
+  U:["under","up"],V:["van","van"],W:["wing","win"],
+  X:["box","six","next"],Y:["yes","yet"],Z:["zap","zip"],
+};
+
+// ===== STATE =====
+let currentSentLevel = 1;
+let sentenceStatus = { 1:{}, 2:{}, 3:{} };
+let testQueue = [], testIndex = 0, testScore = 0, testTotal = 0;
+let testType = "he2en";
+let answered = false;
+
+// ===== SPEECH =====
+function speak(text, rate=0.85) {
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US'; u.rate = rate;
+  window.speechSynthesis.speak(u);
+}
+
+// ===== TOAST =====
+function showToast(msg, dur=1600) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), dur);
+}
+
+// ===== BG STARS =====
+function initBgStars() {
+  const c = document.getElementById('bgStars');
+  const emojis = ['⭐','🌟','✨','💫'];
+  for(let i=0;i<18;i++) {
+    const s = document.createElement('span');
+    s.className = 'bg-star';
+    s.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    s.style.left = Math.random()*100+'%';
+    s.style.animationDuration = (8+Math.random()*14)+'s';
+    s.style.animationDelay = (Math.random()*12)+'s';
+    s.style.fontSize = (14+Math.random()*18)+'px';
+    c.appendChild(s);
+  }
+}
+
+// ===== LETTERS =====
+function initLetters() {
+  const grid = document.getElementById('letterGrid');
+  const alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const colors = ['#4a90d9','#a55eea','#fc5c65','#26de81','#fd9644','#ffd700'];
+  alpha.split('').forEach((l,i) => {
+    const card = document.createElement('div');
+    card.className = 'letter-card';
+    card.innerHTML = `<span class="upper">${l}</span><span class="lower">${l.toLowerCase()}</span>`;
+    card.style.borderBottomColor = colors[i%colors.length];
+    card.onclick = () => selectLetter(l, card);
+    grid.appendChild(card);
+  });
+}
+
+function selectLetter(letter, card) {
+  document.querySelectorAll('.letter-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  speak(letter, 0.7);
+  const words = LETTER_WORDS[letter] || [];
+  const det = document.getElementById('letterDetail');
+  det.innerHTML = `
+    <div class="big-letter">${letter}<span style="color:#a55eea">${letter.toLowerCase()}</span></div>
+    <div class="words-row">
+      ${words.map(w=>`<span class="word-pill" onclick="speak('${w}')">${highlightLetter(w,letter)}</span>`).join('')}
+    </div>
+    <p style="color:#aab0cc; font-size:0.8rem; margin-top:10px;">לחצי על מילה לשמוע</p>
+  `;
+}
+
+function highlightLetter(word, letter) {
+  const lo = letter.toLowerCase();
+  return word.split('').map(c => (c===lo||c===letter) ? `<span class="highlight">${c}</span>` : c).join('');
+}
+
+// ===== VOCAB =====
+let vocabFlipped = {};
+let vocabFilter = 'all';
+function initVocab() {
+  renderVocab();
+  document.querySelectorAll('.vocab-filter').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.vocab-filter').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      vocabFilter = btn.dataset.filter;
+      renderVocab();
+    };
+  });
+  document.getElementById('vocabSearch').oninput = renderVocab;
+}
+
+function renderVocab() {
+  const search = document.getElementById('vocabSearch').value.toLowerCase();
+  let list = VOCAB.filter(v => {
+    const matchFilter = vocabFilter==='all' || v.type===vocabFilter;
+    const matchSearch = v.word.includes(search) || v.he.includes(search);
+    return matchFilter && matchSearch;
+  });
+  const grid = document.getElementById('vocabGrid');
+  grid.innerHTML = list.map((v,i)=>{
+    const key = v.word;
+    const fl = vocabFlipped[key];
+    return `<div class="vocab-card ${fl?'flipped':''}" onclick="flipVocab('${key}',this)">
+      <div class="word-en">${fl?'🔊 '+v.word:v.word}</div>
+      <div class="word-he">${v.he}</div>
+      <div class="example">${fl?v.ex:''}</div>
+      <div class="flip-hint">${fl?'לחצי לשמוע':'לחצי לדוגמה →'}</div>
+    </div>`;
+  }).join('');
+}
+
+function flipVocab(key, el) {
+  if(vocabFlipped[key]) {
+    speak(key);
+  } else {
+    vocabFlipped[key] = true;
+    renderVocab();
+  }
+}
+
+// ===== SENTENCES =====
+function initSentences() {
+  document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSentLevel = parseInt(btn.dataset.level);
+      renderSentences();
+    };
+  });
+  renderSentences();
+}
+
+function renderSentences() {
+  const list = document.getElementById('sentenceList');
+  const sents = SENTENCES[currentSentLevel];
+  const st = sentenceStatus[currentSentLevel];
+  list.innerHTML = sents.map((s,i)=>{
+    const status = st[i] || '';
+    return `<div class="sentence-card ${status}">
+      <div class="sentence-num">${i+1}</div>
+      <div class="sentence-text">${s}</div>
+      <div class="sentence-actions">
+        <button class="speak-btn" onclick="speak('${s.replace(/'/g,"\\'")}');event.stopPropagation()" title="שמעי">🔊</button>
+        <button class="mark-btn ${st[i]==='correct'?'correct':''}" onclick="markSent(${i},'correct');event.stopPropagation()" title="✓">✓</button>
+        <button class="mark-btn ${st[i]==='wrong'?'wrong':''}" onclick="markSent(${i},'wrong');event.stopPropagation()" title="✗">✗</button>
+      </div>
+    </div>`;
+  }).join('');
+  updateSentProgress();
+}
+
+function markSent(idx, status) {
+  const st = sentenceStatus[currentSentLevel];
+  if(st[idx]===status) { delete st[idx]; } else { st[idx]=status; }
+  renderSentences();
+}
+
+function updateSentProgress() {
+  const sents = SENTENCES[currentSentLevel];
+  const st = sentenceStatus[currentSentLevel];
+  const correct = Object.values(st).filter(v=>v==='correct').length;
+  const pct = sents.length ? (correct/sents.length*100) : 0;
+  document.getElementById('sentProgress').style.width = pct+'%';
+}
+
+function resetSentences() {
+  sentenceStatus[currentSentLevel] = {};
+  renderSentences();
+}
+
+// ===== DECODE =====
+function initDecode() {
+  const cont = document.getElementById('decodeContent');
+  let html = '';
+  Object.entries(DECODE).forEach(([title, words]) => {
+    html += `<div class="decode-section-title">📋 ${title}</div>`;
+    html += `<div class="decode-grid">`;
+    words.forEach(w => {
+      html += `<div class="decode-card" onclick="speakDecode(this,'${w}')">${w}</div>`;
+    });
+    html += `</div>`;
+  });
+  cont.innerHTML = html;
+}
+
+function speakDecode(el, word) {
+  document.querySelectorAll('.decode-card.speaking').forEach(c=>c.classList.remove('speaking'));
+  el.classList.add('speaking');
+  speak(word, 0.75);
+  setTimeout(()=>el.classList.remove('speaking'), 900);
+}
+
+// ===== TEST =====
+function initTest() {
+  document.querySelectorAll('.test-type-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.test-type-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      testType = btn.dataset.type;
+      startTest();
+    };
+  });
+}
+
+function startTest() {
+  testQueue = [...VOCAB].sort(()=>Math.random()-0.5);
+  testIndex = 0; testScore = 0; testTotal = 0; answered = false;
+  updateScoreDisplay();
+  showTestQuestion();
+}
+
+function showTestQuestion() {
+  if(testIndex >= testQueue.length) {
+    showTestEnd(); return;
+  }
+  answered = false;
+  const item = testQueue[testIndex];
+  const card = document.getElementById('testCard');
+  
+  // Build distractors
+  let pool = VOCAB.filter(v=>v.word!==item.word);
+  let distractors = pool.sort(()=>Math.random()-0.5).slice(0,3);
+  let options = [...distractors, item].sort(()=>Math.random()-0.5);
+
+  let questionHTML, optionsHTML;
+
+  if(testType==='he2en') {
+    // Show Hebrew, pick English
+    questionHTML = `<div style="font-family:'Fredoka One',cursive; font-size:3rem; color:var(--purple); direction:rtl">${item.he}</div>
+                    <p style="color:#aab0cc; font-size:0.9rem;">מה התרגום לאנגלית?</p>`;
+    optionsHTML = options.map(o=>`
+      <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)">${o.word}</button>
+    `).join('');
+  } else if(testType==='en2he') {
+    questionHTML = `<div class="test-word" style="cursor:pointer" onclick="speak('${item.word}')">${item.word} 🔊</div>
+                    <p style="color:#aab0cc; font-size:0.9rem;">מה פירוש המילה?</p>`;
+    optionsHTML = options.map(o=>`
+      <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)" style="direction:rtl">${o.he}</button>
+    `).join('');
+  } else {
+    // Listen mode
+    questionHTML = `<div style="font-size:4rem; cursor:pointer" onclick="speak('${item.word}',0.7)">🔊</div>
+                    <p style="color:#aab0cc;">שמעי את המילה ובחרי תרגום</p>
+                    <button class="nav-btn secondary" onclick="speak('${item.word}',0.7)" style="margin-top:4px">שמעי שוב</button>`;
+    optionsHTML = options.map(o=>`
+      <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)" style="direction:rtl">${o.he}</button>
+    `).join('');
+    setTimeout(()=>speak(item.word, 0.7), 300);
+  }
+
+  card.innerHTML = `
+    ${questionHTML}
+    <div class="test-options">${optionsHTML}</div>
+    <div class="test-feedback" id="testFeedback"></div>
+  `;
+}
+
+function checkAnswer(chosen, correct, btn) {
+  if(answered) return;
+  answered = true;
+  testTotal++;
+  const fb = document.getElementById('testFeedback');
+  if(chosen===correct) {
+    testScore++;
+    btn.classList.add('correct');
+    fb.textContent = '🌟 נכון!';
+    showToast('🌟 כל הכבוד!', 1200);
+  } else {
+    btn.classList.add('wrong');
+    // Mark correct
+    document.querySelectorAll('.test-option').forEach(b => {
+      if(b.textContent.trim()===correct || b.onclick?.toString().includes(correct)) {
+        // find by data
+      }
+    });
+    fb.textContent = '😅 כמעט! התשובה: ' + correct;
+    showToast('😅 נסי שוב בפעם הבאה', 1400);
+    speak(correct, 0.8);
+  }
+  updateScoreDisplay();
+  setTimeout(()=>{ testIndex++; showTestQuestion(); }, 1600);
+}
+
+function skipTest() { testIndex++; showTestQuestion(); }
+
+function updateScoreDisplay() {
+  document.getElementById('scoreNum').textContent = `${testScore} / ${testTotal}`;
+}
+
+function showTestEnd() {
+  const pct = testTotal ? Math.round(testScore/testTotal*100) : 0;
+  const emoji = pct>=80?'🏆':pct>=60?'⭐':'💪';
+  document.getElementById('testCard').innerHTML = `
+    <div style="font-size:3rem">${emoji}</div>
+    <div style="font-family:'Fredoka One',cursive; font-size:2rem; color:var(--dark)">
+      ${testScore} / ${testTotal}
+    </div>
+    <p style="font-weight:700; color:var(--blue)">${pct}% — ${pct>=80?'מצוין!':pct>=60?'יפה מאוד!':'כדאי לחזור שוב!'}</p>
+    <button class="nav-btn primary" onclick="startTest()">🎯 שחקי שוב</button>
+  `;
+}
+
+// ===== TABS =====
+function initTabs() {
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('sec-'+btn.dataset.tab).classList.add('active');
+    };
+  });
+}
+
+// ===== INIT =====
+initBgStars();
+initTabs();
+initLetters();
+initVocab();
+initSentences();
+initDecode();
+initTest();
+</script>
+</body>
+</html>
