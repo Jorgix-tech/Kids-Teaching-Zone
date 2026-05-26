@@ -62,6 +62,52 @@
   }
   header h1 span { color: var(--blue); }
   header p { font-size: 1rem; color: #6b7db3; margin-top: 6px; font-weight: 600; }
+  
+  .user-greeting {
+    font-size: 1.3rem;
+    color: var(--purple);
+    font-weight: 900;
+    margin-top: 15px;
+    direction: rtl;
+    background: white;
+    display: inline-block;
+    padding: 8px 24px;
+    border-radius: 50px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  }
+  .user-greeting span { color: var(--star2); }
+
+  /* Modal (Login) */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(45,53,97,0.85); z-index: 1000;
+    display: flex; justify-content: center; align-items: center;
+    backdrop-filter: blur(5px);
+  }
+  .modal-box {
+    background: white; padding: 40px; border-radius: var(--radius);
+    text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    max-width: 90%; width: 400px; direction: rtl;
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .modal-box h2 { font-size: 2rem; color: var(--dark); margin-bottom: 10px; font-family: 'Fredoka One', cursive;}
+  .modal-box p { color: #6b7db3; font-weight: 600; margin-bottom: 20px; }
+  .name-input {
+    width: 100%; padding: 14px 20px; margin-bottom: 24px;
+    border: 3px solid #dce3f5; border-radius: 50px;
+    font-size: 1.2rem; font-family: 'Nunito', sans-serif;
+    text-align: center; font-weight: 700; color: var(--dark);
+    transition: all 0.3s;
+  }
+  .name-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(74,144,217,0.2); }
+  .start-btn {
+    width: 100%; padding: 14px; border-radius: 50px; border: none;
+    background: linear-gradient(135deg, var(--blue), var(--purple));
+    color: white; font-family: 'Nunito', sans-serif; font-weight: 900;
+    font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 6px 20px rgba(165, 94, 234, 0.4);
+  }
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(165, 94, 234, 0.6); }
 
   /* Tabs */
   .tabs {
@@ -87,6 +133,7 @@
   }
   .tab-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.15); }
   .tab-btn.active { color: white; transform: translateY(-2px); }
+  .tab-btn[data-tab="home"].active { background: var(--pink); border-color: var(--pink); }
   .tab-btn[data-tab="letters"].active { background: var(--purple); border-color: var(--purple); }
   .tab-btn[data-tab="vocab"].active { background: var(--blue); border-color: var(--blue); }
   .tab-btn[data-tab="sentences"].active { background: var(--green); border-color: var(--green); color: var(--dark); }
@@ -175,6 +222,7 @@
     outline: none;
     transition: all 0.2s;
     width: 160px;
+    text-align: left;
   }
   .vocab-search:focus { border-color: var(--blue); }
 
@@ -242,7 +290,7 @@
     display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
   }
-  .sentence-text { flex: 1; font-size: 1.05rem; font-weight: 600; }
+  .sentence-text { flex: 1; font-size: 1.05rem; font-weight: 600; text-align: left;}
   .sentence-actions { display: flex; gap: 8px; }
   .speak-btn, .mark-btn {
     width: 36px; height: 36px; border-radius: 50%; border: none;
@@ -256,7 +304,7 @@
   .mark-btn:not(.correct):not(.wrong) { background: #f0f2f8; color: #aab0cc; }
   .mark-btn:hover { transform: scale(1.1); }
 
-  .progress-bar-wrap { background: #edf0f8; border-radius: 50px; height: 10px; margin-bottom: 20px; overflow: hidden; }
+  .progress-bar-wrap { background: #edf0f8; border-radius: 50px; height: 10px; margin-bottom: 20px; overflow: hidden; direction: ltr;}
   .progress-bar { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--green), var(--blue)); transition: width 0.5s; }
 
   /* ===== DECODE SECTION ===== */
@@ -313,7 +361,7 @@
     color: var(--dark);
     letter-spacing: 2px;
   }
-  .test-options { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+  .test-options { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; direction: ltr; }
   .test-option {
     padding: 12px 28px;
     border-radius: 50px;
@@ -332,7 +380,7 @@
   .test-option.correct { background: #d4fae8; border-color: var(--green); color: var(--dark); }
   .test-option.wrong { background: #ffd8da; border-color: var(--red); color: var(--dark); }
   .test-feedback { font-size: 2rem; animation: popIn 0.3s; }
-  .test-nav { display: flex; gap: 14px; justify-content: center; margin-top: 14px; }
+  .test-nav { display: flex; gap: 14px; justify-content: center; margin-top: 14px; direction: rtl; }
   .nav-btn {
     padding: 12px 28px;
     border-radius: 50px;
@@ -357,9 +405,9 @@
     margin-bottom: 18px;
   }
   .score-display .score-num { font-family: 'Fredoka One', cursive; font-size: 3rem; }
-  .score-display p { opacity: 0.85; font-weight: 600; }
+  .score-display p { opacity: 0.85; font-weight: 600; direction: rtl;}
 
-  .test-type-selector { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+  .test-type-selector { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; direction: rtl;}
   .test-type-btn {
     padding: 10px 20px; border-radius: 50px; border: 2px solid #dce3f5;
     background: white; font-family: 'Nunito', sans-serif;
@@ -383,6 +431,43 @@
   }
   .alpha-strip span { color: var(--blue); }
 
+  /* Reset User Button */
+  .reset-user-btn {
+    display: block; margin: 40px auto; padding: 10px 20px;
+    background: none; border: 2px dashed #b0bbdd; border-radius: 50px;
+    color: #8899cc; font-family: 'Nunito', sans-serif; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; direction: rtl;
+  }
+  .reset-user-btn:hover { background: #fff0f1; border-color: var(--red); color: var(--red); }
+
+  /* ===== HOME SECTION ===== */
+  .home-stats {
+    text-align: center; margin-bottom: 30px; background: white;
+    padding: 30px 20px; border-radius: var(--radius); box-shadow: var(--shadow);
+    animation: popIn 0.4s ease;
+  }
+  .home-stats h2 { color: var(--purple); font-family: 'Fredoka One', cursive; font-size: 2.2rem; margin-bottom: 10px;}
+  .home-stats .stars { font-size: 2.5rem; font-weight: 900; color: var(--star2); text-shadow: 0 4px 12px rgba(255, 159, 67, 0.2); }
+  .home-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px;
+    direction: rtl;
+  }
+  .home-card {
+    background: white; border-radius: var(--radius); padding: 24px 16px;
+    text-align: center; box-shadow: var(--shadow); cursor: pointer;
+    transition: all 0.25s; border: 4px solid transparent;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 12px; color: var(--dark);
+  }
+  .home-card:hover { transform: translateY(-5px) scale(1.03); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
+  .home-card .icon { font-size: 3.5rem; line-height: 1; }
+  .home-card .title { font-family: 'Fredoka One', cursive; font-size: 1.25rem; }
+  .home-card.c-letters:hover { border-color: var(--purple); background: #fcf9ff;}
+  .home-card.c-vocab:hover { border-color: var(--blue); background: #f5f9ff;}
+  .home-card.c-sentences:hover { border-color: var(--green); background: #f2fdf7;}
+  .home-card.c-decode:hover { border-color: var(--star2); background: #fffcf5;}
+  .home-card.c-test:hover { border-color: var(--red); background: #fff5f6;}
+
   /* Responsive */
   @media (max-width: 500px) {
     .vocab-grid { grid-template-columns: 1fr 1fr; }
@@ -394,86 +479,131 @@
     position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
     background: var(--dark); color: white; padding: 12px 28px;
     border-radius: 50px; font-weight: 700; font-size: 0.95rem;
-    z-index: 999; transition: transform 0.35s;
+    z-index: 999; transition: transform 0.35s; direction: rtl;
     box-shadow: 0 8px 28px rgba(0,0,0,0.2);
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* Speak animation */
-  @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15); } }
-  .pulsing { animation: pulse 0.5s ease infinite; }
 </style>
 </head>
 <body>
 
+<!-- Login Modal -->
+<div class="modal-overlay" id="welcomeModal" style="display: none;">
+  <div class="modal-box">
+    <h2>ברוכים הבאים! ⭐</h2>
+    <p>איך קוראים לך?</p>
+    <input type="text" class="name-input" id="nameInput" placeholder="הקלידי כאן את שמך..." onkeypress="if(event.key==='Enter') submitName()">
+    <button class="start-btn" onclick="submitName()">בואו נתחיל! 🚀</button>
+  </div>
+</div>
+
+<!-- Reset Confirmation Modal -->
+<div class="modal-overlay" id="resetModal" style="display: none; z-index: 2000;">
+  <div class="modal-box">
+    <h2 style="color: var(--red);">איפוס נתונים ⚠️</h2>
+    <p>האם את בטוחה שאת רוצה למחוק את כל ההתקדמות ולהחליף משתמש?</p>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
+      <button class="nav-btn secondary" onclick="cancelReset()">ביטול</button>
+      <button class="nav-btn primary" style="background: var(--red); box-shadow: 0 4px 14px rgba(252,92,101,0.4);" onclick="confirmReset()">כן, למחוק</button>
+    </div>
+  </div>
+</div>
+
 <!-- Floating background stars -->
 <div class="bg-stars" id="bgStars"></div>
 
-<header>
+<header style="cursor: pointer;" onclick="switchTab('home')" title="חזרה למסך הראשי">
   <h1>⭐ Reading <span>Stars</span></h1>
   <p>מבדק קריאה — סוף כיתה ג׳ | לחצי על כל דבר לשמוע!</p>
+  <div class="user-greeting" id="userGreeting" style="display:none;"></div>
 </header>
 
-<div class="tabs">
-  <button class="tab-btn active" data-tab="letters">🔤 אותיות</button>
+<div class="tabs" dir="rtl">
+  <button class="tab-btn active" data-tab="home">🏠 ראשי</button>
+  <button class="tab-btn" data-tab="letters">🔤 אותיות</button>
   <button class="tab-btn" data-tab="vocab">📖 מילון</button>
   <button class="tab-btn" data-tab="sentences">📝 משפטים</button>
-  <button class="tab-btn" data-tab="decode">⚡ Quick Decode</button>
+  <button class="tab-btn" data-tab="decode">⚡ קריאה מהירה</button>
   <button class="tab-btn" data-tab="test">🎯 בחן את עצמי</button>
 </div>
 
 <main>
 
+  <!-- ===== HOME ===== -->
+  <section class="section active" id="sec-home">
+    <div class="home-stats" id="homeStats">
+      <h2>ברוכים הבאים!</h2>
+      <p style="color:#6b7db3; font-weight:bold; font-size:1.1rem;">לחצי על אחד הנושאים כדי להתחיל ללמוד</p>
+    </div>
+    <div class="home-grid">
+      <div class="home-card c-letters" onclick="switchTab('letters')">
+        <div class="icon">🔤</div><div class="title">אותיות</div>
+      </div>
+      <div class="home-card c-vocab" onclick="switchTab('vocab')">
+        <div class="icon">📖</div><div class="title">מילון</div>
+      </div>
+      <div class="home-card c-sentences" onclick="switchTab('sentences')">
+        <div class="icon">📝</div><div class="title">משפטים</div>
+      </div>
+      <div class="home-card c-decode" onclick="switchTab('decode')">
+        <div class="icon">⚡</div><div class="title">קריאה מהירה</div>
+      </div>
+      <div class="home-card c-test" onclick="switchTab('test')">
+        <div class="icon">🎯</div><div class="title">מבחן</div>
+      </div>
+    </div>
+  </section>
+
   <!-- ===== LETTERS ===== -->
-  <section class="section active" id="sec-letters">
+  <section class="section" id="sec-letters">
     <div class="alpha-strip">
       <span>A B C D E F G H I J K L M N O P Q R S T U V W X Y Z</span><br>
       a b c d e f g h i j k l m n o p q r s t u v w x y z
     </div>
     <div class="alphabet-row" id="letterGrid"></div>
     <div class="letter-detail" id="letterDetail">
-      <p style="color:#aab0cc; font-weight:600;">👆 לחצי על אות כדי לראות ולשמוע מילים</p>
+      <p style="color:#aab0cc; font-weight:600; direction: rtl;">👆 לחצי על אות כדי לראות ולשמוע מילים</p>
     </div>
   </section>
 
   <!-- ===== VOCAB ===== -->
   <section class="section" id="sec-vocab">
-    <div class="vocab-controls">
+    <div class="vocab-controls" dir="rtl">
       <button class="vocab-filter active" data-filter="all">כל המילים</button>
       <button class="vocab-filter" data-filter="nouns">שמות עצם</button>
       <button class="vocab-filter" data-filter="adj">תארים</button>
       <button class="vocab-filter" data-filter="other">אחר</button>
-      <input class="vocab-search" id="vocabSearch" type="text" placeholder="🔍 חיפוש...">
+      <input class="vocab-search" id="vocabSearch" type="text" placeholder="🔍 חיפוש..." dir="rtl">
     </div>
     <div class="vocab-grid" id="vocabGrid"></div>
-    <p style="text-align:center; color:#aab0cc; font-size:0.85rem; margin-top:12px;">💡 לחצי על כרטיסייה לתרגום | 🔊 לחצי שוב לשמוע</p>
+    <p style="text-align:center; color:#aab0cc; font-size:0.85rem; margin-top:12px; direction: rtl;">💡 לחצי על כרטיסייה לתרגום | 🔊 לחצי שוב לשמוע</p>
   </section>
 
   <!-- ===== SENTENCES ===== -->
   <section class="section" id="sec-sentences">
-    <div class="level-tabs">
+    <div class="level-tabs" dir="ltr">
       <button class="level-btn active" data-level="1">⭐ Level 1</button>
       <button class="level-btn" data-level="2">⭐⭐ Level 2</button>
       <button class="level-btn" data-level="3">⭐⭐⭐ Level 3</button>
     </div>
     <div class="progress-bar-wrap"><div class="progress-bar" id="sentProgress" style="width:0%"></div></div>
-    <div id="sentenceList"></div>
+    <div id="sentenceList" dir="ltr"></div>
     <div style="text-align:center; margin-top:16px;">
-      <button class="nav-btn secondary" onclick="resetSentences()">🔄 איפוס</button>
+      <button class="nav-btn secondary" onclick="resetSentences()">🔄 איפוס משפטים</button>
     </div>
   </section>
 
   <!-- ===== DECODE ===== -->
   <section class="section" id="sec-decode">
-    <p style="text-align:center; color:#6b7db3; font-weight:600; margin-bottom:16px;">⚡ לחצי על כל מילה לשמוע אותה — תרגול קריאה מהירה!</p>
-    <div id="decodeContent"></div>
+    <p style="text-align:center; color:#6b7db3; font-weight:600; margin-bottom:16px; direction: rtl;">⚡ לחצי על כל מילה לשמוע אותה — תרגול קריאה מהירה!</p>
+    <div id="decodeContent" dir="ltr"></div>
   </section>
 
   <!-- ===== TEST ===== -->
   <section class="section" id="sec-test">
     <div class="score-display" id="scoreDisplay">
       <div class="score-num" id="scoreNum">0 / 0</div>
-      <p>נקודות</p>
+      <p>נקודות במבחן הנוכחי</p>
     </div>
     <div class="test-type-selector">
       <button class="test-type-btn active" data-type="he2en">עברית ← אנגלית</button>
@@ -481,13 +611,15 @@
       <button class="test-type-btn" data-type="listen">🔊 שמיעה</button>
     </div>
     <div class="test-card" id="testCard">
-      <p style="color:#aab0cc; font-weight:600;">לחצי "התחלה" לבחינה!</p>
+      <p style="color:#aab0cc; font-weight:600; direction: rtl;">לחצי "התחלה" לבחינה!</p>
     </div>
     <div class="test-nav">
-      <button class="nav-btn secondary" onclick="skipTest()">⏭ דלגי</button>
       <button class="nav-btn primary" onclick="startTest()">🎯 התחלה</button>
+      <button class="nav-btn secondary" onclick="skipTest()">⏭ דלגי</button>
     </div>
   </section>
+
+  <button class="reset-user-btn" onclick="logoutUser()">🔄 החלפת משתמש / איפוס נתונים</button>
 
 </main>
 
@@ -584,12 +716,115 @@ const LETTER_WORDS = {
   X:["box","six","next"],Y:["yes","yet"],Z:["zap","zip"],
 };
 
-// ===== STATE =====
+// ===== STATE & LOCAL STORAGE =====
+const STORAGE_KEY = 'readingStarsProgress';
+let appState = {
+  userName: "",
+  sentenceStatus: { 1:{}, 2:{}, 3:{} },
+  vocabFlipped: {},
+  totalStars: 0
+};
+
 let currentSentLevel = 1;
-let sentenceStatus = { 1:{}, 2:{}, 3:{} };
 let testQueue = [], testIndex = 0, testScore = 0, testTotal = 0;
 let testType = "he2en";
 let answered = false;
+
+// Load Data
+function loadProgress() {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      appState = { ...appState, ...parsed }; // Merge default with saved
+    } catch(e) {
+      console.error("Error loading progress", e);
+    }
+  }
+}
+
+// Save Data
+function saveProgress() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+  updateGreetingUI();
+}
+
+// ===== INITIALIZATION & USER LOGIN =====
+function initApp() {
+  loadProgress();
+  
+  if (!appState.userName) {
+    document.getElementById('welcomeModal').style.display = 'flex';
+    document.getElementById('nameInput').focus();
+  } else {
+    updateGreetingUI();
+  }
+
+  initBgStars();
+  initTabs();
+  initLetters();
+  initVocab();
+  initSentences();
+  initDecode();
+  initTest();
+}
+
+function submitName() {
+  const input = document.getElementById('nameInput').value.trim();
+  if (input) {
+    appState.userName = input;
+    document.getElementById('welcomeModal').style.display = 'none';
+    saveProgress();
+    showToast('ברוכה הבאה ' + input + '! 🎉', 2000);
+  } else {
+    showToast('אנא הכניסי שם 😊', 2000);
+  }
+}
+
+function logoutUser() {
+  document.getElementById('resetModal').style.display = 'flex';
+}
+
+function cancelReset() {
+  document.getElementById('resetModal').style.display = 'none';
+}
+
+function confirmReset() {
+  localStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+function updateGreetingUI() {
+  const greetEl = document.getElementById('userGreeting');
+  const homeStats = document.getElementById('homeStats');
+  if (appState.userName) {
+    greetEl.style.display = 'inline-block';
+    greetEl.innerHTML = `שלום, ${appState.userName}! אספת <span>${appState.totalStars} ⭐</span>`;
+    if (homeStats) {
+      homeStats.innerHTML = `
+        <h2>איזה כיף שחזרת, ${appState.userName}!</h2>
+        <div class="stars">הכוכבים שלך: ${appState.totalStars} ⭐</div>
+        <p style="margin-top:15px; color:#6b7db3; font-weight:bold; font-size:1.1rem; direction:rtl;">באיזה נושא נרצה לתרגל היום?</p>
+      `;
+    }
+  } else {
+    greetEl.style.display = 'none';
+  }
+}
+
+// ===== TAB SWITCHING =====
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  
+  const activeBtn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+  
+  const activeSec = document.getElementById('sec-' + tabId);
+  if (activeSec) activeSec.classList.add('active');
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
 
 // ===== SPEECH =====
 function speak(text, rate=0.85) {
@@ -648,7 +883,7 @@ function selectLetter(letter, card) {
     <div class="words-row">
       ${words.map(w=>`<span class="word-pill" onclick="speak('${w}')">${highlightLetter(w,letter)}</span>`).join('')}
     </div>
-    <p style="color:#aab0cc; font-size:0.8rem; margin-top:10px;">לחצי על מילה לשמוע</p>
+    <p style="color:#aab0cc; font-size:0.8rem; margin-top:10px; direction:rtl;">לחצי על מילה לשמוע</p>
   `;
 }
 
@@ -658,7 +893,6 @@ function highlightLetter(word, letter) {
 }
 
 // ===== VOCAB =====
-let vocabFlipped = {};
 let vocabFilter = 'all';
 function initVocab() {
   renderVocab();
@@ -683,7 +917,7 @@ function renderVocab() {
   const grid = document.getElementById('vocabGrid');
   grid.innerHTML = list.map((v,i)=>{
     const key = v.word;
-    const fl = vocabFlipped[key];
+    const fl = appState.vocabFlipped[key];
     return `<div class="vocab-card ${fl?'flipped':''}" onclick="flipVocab('${key}',this)">
       <div class="word-en">${fl?'🔊 '+v.word:v.word}</div>
       <div class="word-he">${v.he}</div>
@@ -694,10 +928,11 @@ function renderVocab() {
 }
 
 function flipVocab(key, el) {
-  if(vocabFlipped[key]) {
+  if(appState.vocabFlipped[key]) {
     speak(key);
   } else {
-    vocabFlipped[key] = true;
+    appState.vocabFlipped[key] = true;
+    saveProgress(); // Save state
     renderVocab();
   }
 }
@@ -718,7 +953,8 @@ function initSentences() {
 function renderSentences() {
   const list = document.getElementById('sentenceList');
   const sents = SENTENCES[currentSentLevel];
-  const st = sentenceStatus[currentSentLevel];
+  const st = appState.sentenceStatus[currentSentLevel] || {};
+  
   list.innerHTML = sents.map((s,i)=>{
     const status = st[i] || '';
     return `<div class="sentence-card ${status}">
@@ -735,21 +971,30 @@ function renderSentences() {
 }
 
 function markSent(idx, status) {
-  const st = sentenceStatus[currentSentLevel];
-  if(st[idx]===status) { delete st[idx]; } else { st[idx]=status; }
+  if (!appState.sentenceStatus[currentSentLevel]) {
+    appState.sentenceStatus[currentSentLevel] = {};
+  }
+  const st = appState.sentenceStatus[currentSentLevel];
+  if(st[idx]===status) { 
+    delete st[idx]; 
+  } else { 
+    st[idx]=status; 
+  }
+  saveProgress(); // Save state
   renderSentences();
 }
 
 function updateSentProgress() {
   const sents = SENTENCES[currentSentLevel];
-  const st = sentenceStatus[currentSentLevel];
+  const st = appState.sentenceStatus[currentSentLevel] || {};
   const correct = Object.values(st).filter(v=>v==='correct').length;
   const pct = sents.length ? (correct/sents.length*100) : 0;
   document.getElementById('sentProgress').style.width = pct+'%';
 }
 
 function resetSentences() {
-  sentenceStatus[currentSentLevel] = {};
+  appState.sentenceStatus[currentSentLevel] = {};
+  saveProgress(); // Save state
   renderSentences();
 }
 
@@ -812,21 +1057,21 @@ function showTestQuestion() {
   if(testType==='he2en') {
     // Show Hebrew, pick English
     questionHTML = `<div style="font-family:'Fredoka One',cursive; font-size:3rem; color:var(--purple); direction:rtl">${item.he}</div>
-                    <p style="color:#aab0cc; font-size:0.9rem;">מה התרגום לאנגלית?</p>`;
+                    <p style="color:#aab0cc; font-size:0.9rem; direction:rtl;">מה התרגום לאנגלית?</p>`;
     optionsHTML = options.map(o=>`
       <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)">${o.word}</button>
     `).join('');
   } else if(testType==='en2he') {
     questionHTML = `<div class="test-word" style="cursor:pointer" onclick="speak('${item.word}')">${item.word} 🔊</div>
-                    <p style="color:#aab0cc; font-size:0.9rem;">מה פירוש המילה?</p>`;
+                    <p style="color:#aab0cc; font-size:0.9rem; direction:rtl;">מה פירוש המילה?</p>`;
     optionsHTML = options.map(o=>`
       <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)" style="direction:rtl">${o.he}</button>
     `).join('');
   } else {
     // Listen mode
     questionHTML = `<div style="font-size:4rem; cursor:pointer" onclick="speak('${item.word}',0.7)">🔊</div>
-                    <p style="color:#aab0cc;">שמעי את המילה ובחרי תרגום</p>
-                    <button class="nav-btn secondary" onclick="speak('${item.word}',0.7)" style="margin-top:4px">שמעי שוב</button>`;
+                    <p style="color:#aab0cc; direction:rtl;">שמעי את המילה ובחרי תרגום</p>
+                    <button class="nav-btn secondary" onclick="speak('${item.word}',0.7)" style="margin-top:4px; font-size:0.85rem; padding:8px 16px;">שמעי שוב</button>`;
     optionsHTML = options.map(o=>`
       <button class="test-option" onclick="checkAnswer('${o.word}','${item.word}',this)" style="direction:rtl">${o.he}</button>
     `).join('');
@@ -847,15 +1092,18 @@ function checkAnswer(chosen, correct, btn) {
   const fb = document.getElementById('testFeedback');
   if(chosen===correct) {
     testScore++;
+    appState.totalStars++; // Add to total stars
+    saveProgress(); // Save global progress
     btn.classList.add('correct');
     fb.textContent = '🌟 נכון!';
     showToast('🌟 כל הכבוד!', 1200);
   } else {
     btn.classList.add('wrong');
-    // Mark correct
+    // Highlight correct answer visually
     document.querySelectorAll('.test-option').forEach(b => {
       if(b.textContent.trim()===correct || b.onclick?.toString().includes(correct)) {
-        // find by data
+        b.style.borderColor = "var(--green)";
+        b.style.color = "var(--green)";
       }
     });
     fb.textContent = '😅 כמעט! התשובה: ' + correct;
@@ -863,7 +1111,7 @@ function checkAnswer(chosen, correct, btn) {
     speak(correct, 0.8);
   }
   updateScoreDisplay();
-  setTimeout(()=>{ testIndex++; showTestQuestion(); }, 1600);
+  setTimeout(()=>{ testIndex++; showTestQuestion(); }, 1800);
 }
 
 function skipTest() { testIndex++; showTestQuestion(); }
@@ -880,7 +1128,7 @@ function showTestEnd() {
     <div style="font-family:'Fredoka One',cursive; font-size:2rem; color:var(--dark)">
       ${testScore} / ${testTotal}
     </div>
-    <p style="font-weight:700; color:var(--blue)">${pct}% — ${pct>=80?'מצוין!':pct>=60?'יפה מאוד!':'כדאי לחזור שוב!'}</p>
+    <p style="font-weight:700; color:var(--blue); direction:rtl;">${pct}% — ${pct>=80?'מצוין!':pct>=60?'יפה מאוד!':'כדאי לחזור שוב!'}</p>
     <button class="nav-btn primary" onclick="startTest()">🎯 שחקי שוב</button>
   `;
 }
@@ -888,23 +1136,13 @@ function showTestEnd() {
 // ===== TABS =====
 function initTabs() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('sec-'+btn.dataset.tab).classList.add('active');
-    };
+    btn.onclick = () => switchTab(btn.dataset.tab);
   });
 }
 
-// ===== INIT =====
-initBgStars();
-initTabs();
-initLetters();
-initVocab();
-initSentences();
-initDecode();
-initTest();
+// Start everything
+window.onload = initApp;
+
 </script>
 </body>
 </html>
