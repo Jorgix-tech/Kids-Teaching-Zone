@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 כוכבי הלימוד - חשבון ושעון</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #f0fdfa;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Clock CSS */
+        .clock-container {
+            width: 220px;
+            height: 220px;
+            border: 12px solid #3b82f6;
+            border-radius: 50%;
+            background-color: white;
+            position: relative;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin: 0 auto 20px auto;
+        }
+        
+        .clock-center {
+            width: 16px;
+            height: 16px;
+            background-color: #1e40af;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+
+        .clock-hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: bottom center;
+            border-radius: 4px;
+            transition: transform 0.3s cubic-bezier(0.4, 2.08, 0.55, 0.44);
+        }
+
+        .hour-hand {
+            width: 8px;
+            height: 60px;
+            background-color: #1e3a8a;
+            margin-left: -4px;
+            z-index: 8;
+        }
+
+        .minute-hand {
+            width: 4px;
+            height: 85px;
+            background-color: #ef4444;
+            margin-left: -2px;
+            z-index: 9;
+        }
+
+        .clock-tick {
+            position: absolute;
+            width: 4px;
+            height: 10px;
+            background-color: #9ca3af;
+            left: 50%;
+            margin-left: -2px;
+            transform-origin: 50% 110px;
+        }
+        
+        .clock-tick.main {
+            width: 6px;
+            height: 14px;
+            background-color: #4b5563;
+            margin-left: -3px;
+        }
+
+        /* Animations */
+        @keyframes bounce-sm {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-bounce-sm {
+            animation: bounce-sm 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        .modal-bg {
+            background-color: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .level-btn {
+            @apply flex-1 py-2 px-3 rounded-lg font-bold text-sm md:text-base transition-colors shadow-sm text-center;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-40">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold cursor-pointer hover:text-blue-200 transition-colors" onclick="goHome()">
+                🌟 כוכבי הלימוד
+            </h1>
+            <div id="userStats" class="hidden flex-col md:flex-row items-end md:items-center gap-1 md:gap-4">
+                <span class="text-lg font-semibold">שלום <span id="displayUserName" class="text-yellow-300"></span>!</span>
+                <span class="bg-white text-indigo-700 px-3 py-1 rounded-full font-bold shadow-inner flex items-center gap-1 transition-transform duration-300" id="starBadge">
+                    ⭐ <span id="displayStars">0</span>
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col items-center p-4 md:p-8 w-full max-w-4xl mx-auto">
+        
+        <!-- ==================== HOME SCREEN ==================== -->
+        <div id="screen-home" class="w-full text-center space-y-8 animate-fade-in hidden">
+            <h2 class="text-3xl font-bold text-indigo-800 mt-4 mb-4">מה נרצה ללמוד היום?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl mx-auto">
+                
+                <!-- Math Subject -->
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-green-400 flex flex-col h-full">
+                    <div class="text-6xl mb-4">🧮</div>
+                    <h3 class="text-2xl font-bold text-slate-700 mb-6">חשבון עד 20</h3>
+                    
+                    <div class="flex-grow flex flex-col justify-center gap-4">
+                        <button onclick="startSubject('math', 'practice')" class="w-full bg-green-100 hover:bg-green-200 text-green-800 font-bold py-4 px-6 rounded-xl text-lg transition-colors shadow-sm">
+                            מצב תרגול (בלי זמנים)
+                        </button>
+                        <button onclick="startSubject('math', 'test')" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl text-lg transition-colors shadow-sm flex items-center justify-center gap-2">
+                            ⏱️ מצב מבחן (60 שניות)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Clock Subject (Multi-Level) -->
+                <div class="bg-white rounded-3xl p-6 shadow-xl border-4 border-blue-400 flex flex-col h-full">
+                    <div class="text-6xl mb-4">⏰</div>
+                    <h3 class="text-2xl font-bold text-slate-700 mb-4">לימוד שעון (בשלבים)</h3>
+                    
+                    <div class="flex flex-col gap-4 flex-grow">
+                        
+                        <!-- Level 1 -->
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                            <div class="font-bold text-blue-900 mb-2">שלב 1: שעון 24 שעות</div>
+                            <div class="flex gap-2">
+                                <button onclick="startSubject('clock_l1', 'practice')" class="level-btn bg-blue-200 hover:bg-blue-300 text-blue-900">תרגול</button>
+                                <button onclick="startSubject('clock_l1', 'test')" class="level-btn bg-blue-500 hover:bg-blue-600 text-white flex justify-center items-center gap-1"><span>⏱️</span> מבחן</button>
+                            </div>
+                        </div>
+
+                        <!-- Level 2 -->
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                            <div class="font-bold text-blue-900 mb-2">שלב 2: הבנת דקות</div>
+                            <div class="flex gap-2">
+                                <button onclick="startSubject('clock_l2', 'practice')" class="level-btn bg-blue-200 hover:bg-blue-300 text-blue-900">תרגול</button>
+                                <button onclick="startSubject('clock_l2', 'test')" class="level-btn bg-blue-500 hover:bg-blue-600 text-white flex justify-center items-center gap-1"><span>⏱️</span> מבחן</button>
+                            </div>
+                        </div>
+
+                        <!-- Level 3 -->
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100">
+                            <div class="font-bold text-blue-900 mb-2">שלב 3: שעון מחוגים</div>
+                            <div class="flex gap-2">
+                                <button onclick="startSubject('clock_l3', 'practice')" class="level-btn bg-blue-200 hover:bg-blue-300 text-blue-900">תרגול</button>
+                                <button onclick="startSubject('clock_l3', 'test')" class="level-btn bg-blue-500 hover:bg-blue-600 text-white flex justify-center items-center gap-1"><span>⏱️</span> מבחן</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== GAME SCREEN ==================== -->
+        <div id="screen-game" class="w-full max-w-xl mx-auto hidden bg-white rounded-3xl p-6 md:p-8 shadow-xl border-t-8">
+            
+            <!-- Game Header -->
+            <div class="flex justify-between items-center mb-4 border-b pb-4">
+                <button onclick="goHome()" class="text-slate-500 hover:text-slate-800 font-semibold flex items-center gap-1 bg-slate-100 px-3 py-1 rounded-lg transition-colors">
+                    <span>🏠</span> חזרה
+                </button>
+                <div id="gameModeTitle" class="text-xl font-bold text-slate-700 text-center flex-1 mx-2"></div>
+                <div id="scoreDisplay" class="text-lg font-bold text-indigo-600 hidden bg-indigo-50 px-3 py-1 rounded-lg border border-indigo-100">
+                    תשובות נכונות: <span id="correctAnswersCount">0</span>
+                </div>
+            </div>
+
+            <!-- Visual Timer Bar -->
+            <div id="timerContainer" class="hidden w-full mb-6">
+                <div class="flex justify-between text-sm font-bold text-slate-500 mb-1">
+                    <span>זמן נותר:</span>
+                    <span id="timerText" class="text-red-500">60 שניות</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-4 overflow-hidden shadow-inner border border-slate-200">
+                    <div id="timerBar" class="bg-red-500 h-4 rounded-full transition-all duration-1000 ease-linear" style="width: 100%"></div>
+                </div>
+            </div>
+
+            <!-- Generic Text Question Container (For Math, Clock L1, Clock L2) -->
+            <div id="textQuestionContainer" class="hidden text-center min-h-[120px] flex items-center justify-center">
+                <div class="text-5xl md:text-7xl font-extrabold text-slate-800 tracking-widest drop-shadow-sm" dir="ltr" id="mainQuestionText">
+                    <!-- Question text injected here -->
+                </div>
+            </div>
+
+            <!-- Analog Clock Container (For Clock L3) -->
+            <div id="clockContainer" class="hidden text-center min-h-[120px]">
+                <div class="clock-container" id="analogClock">
+                    <div class="clock-center"></div>
+                    <div class="clock-hand hour-hand" id="hourHand"></div>
+                    <div class="clock-hand minute-hand" id="minuteHand"></div>
+                    <!-- Ticks generated via JS -->
+                </div>
+                <div class="text-2xl font-bold text-slate-700 mb-6">מה השעה?</div>
+            </div>
+
+            <!-- Options Grid -->
+            <div id="optionsGrid" class="grid grid-cols-2 gap-3 md:gap-4 mt-6">
+                <!-- Buttons injected via JS -->
+            </div>
+            
+            <!-- Feedback Message (Includes Explanations & Continue Button) -->
+            <div id="feedbackMessage" class="text-lg md:text-xl font-bold text-center mt-6 min-h-[80px] transition-opacity duration-300 opacity-0 flex flex-col items-center justify-center gap-2">
+                <!-- Content injected via JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="p-6 text-center mt-auto">
+        <button onclick="showResetModal()" class="text-sm text-slate-400 hover:text-red-500 underline transition-colors">
+            החלפת משתמש / איפוס נתונים
+        </button>
+    </footer>
+
+
+    <!-- ==================== MODALS ==================== -->
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div class="text-6xl mb-4">👋</div>
+            <h2 class="text-2xl font-extrabold text-indigo-900 mb-2">ברוכים הבאים!</h2>
+            <p class="text-slate-600 mb-6">איך קוראים לך?</p>
+            <input type="text" id="nameInput" class="w-full text-center text-xl font-bold p-3 border-2 border-indigo-200 rounded-xl mb-6 focus:outline-none focus:border-indigo-500 bg-indigo-50" placeholder="הקלד/י כאן..." autocomplete="off">
+            <button onclick="saveUser()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-lg shadow-md transition-colors">
+                בואו נתחיל ללמוד! 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Reset Confirm Modal -->
+    <div id="resetModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <div class="text-5xl mb-4">⚠️</div>
+            <h2 class="text-xl font-bold text-slate-800 mb-4">איפוס נתונים</h2>
+            <p class="text-slate-600 mb-8">האם אתם בטוחים שברצונכם לאפס את המשתמש? כל הכוכבים יימחקו.</p>
+            <div class="flex gap-4">
+                <button onclick="hideResetModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 rounded-xl transition-colors">
+                    ביטול
+                </button>
+                <button onclick="resetData()" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-bold py-2 rounded-xl transition-colors">
+                    כן, לאפס
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Test Modal -->
+    <div id="testEndModal" class="fixed inset-0 modal-bg flex items-center justify-center z-50 hidden p-4">
+        <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+            <div class="text-7xl mb-4 animate-bounce-sm">🎉</div>
+            <h2 class="text-3xl font-extrabold text-indigo-900 mb-2">נגמר הזמן!</h2>
+            <p class="text-xl text-slate-600 mb-6">הצלחת לענות נכון על <strong id="finalScoreText" class="text-indigo-600"></strong> שאלות.</p>
+            
+            <div class="bg-yellow-100 rounded-2xl p-4 mb-8 inline-block border-2 border-yellow-300">
+                <p class="text-lg font-bold text-yellow-700">הרווחת במבחן הזה</p>
+                <div class="text-4xl font-extrabold text-yellow-600 mt-1">
+                    +<span id="earnedStarsText"></span> ⭐
+                </div>
+            </div>
+
+            <button onclick="closeTestModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-xl text-xl shadow-md transition-colors">
+                איזה כיף! תודה 🏠
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- State Management ---
+        const STATE = {
+            name: '',
+            stars: 0,
+            currentSubject: null, // 'math', 'clock_l1', 'clock_l2', 'clock_l3'
+            currentMode: null,
+            totalTime: 60,
+            timeLeft: 0,
+            testScore: 0,
+            currentCorrectAnswer: null,
+            currentExplanation: '', // Stores explanation for wrong answers
+            isAnswering: false,
+            isPaused: false, // Pauses the timer when reading explanation
+            wrongTimeout: null
+        };
+
+        // Standard robust interval
+        let gameInterval = null; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateClockTicks();
+            loadUserData();
+        });
+
+        function loadUserData() {
+            const savedName = localStorage.getItem('kidsLearning_name');
+            const savedStars = localStorage.getItem('kidsLearning_stars');
+
+            if (savedName) {
+                STATE.name = savedName;
+                STATE.stars = savedStars ? parseInt(savedStars) : 0;
+                updateHeader();
+                showScreen('home');
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('nameInput').focus();
+            }
+        }
+
+        function saveUser() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                STATE.name = name;
+                STATE.stars = 0;
+                localStorage.setItem('kidsLearning_name', STATE.name);
+                localStorage.setItem('kidsLearning_stars', STATE.stars);
+                document.getElementById('loginModal').classList.add('hidden');
+                updateHeader();
+                showScreen('home');
+            }
+        }
+
+        function updateHeader() {
+            document.getElementById('userStats').classList.remove('hidden');
+            document.getElementById('userStats').classList.add('flex');
+            document.getElementById('displayUserName').textContent = STATE.name;
+            document.getElementById('displayStars').textContent = STATE.stars;
+        }
+
+        // Add stars and give a visual pop!
+        function saveStars(additionalStars = 0) {
+            if (additionalStars > 0) {
+                STATE.stars += additionalStars;
+                localStorage.setItem('kidsLearning_stars', STATE.stars);
+                updateHeader();
+                
+                // Visual bounce effect on the star badge
+                const badge = document.getElementById('starBadge');
+                badge.classList.add('scale-125', 'text-yellow-500');
+                setTimeout(() => {
+                    badge.classList.remove('scale-125', 'text-yellow-500');
+                }, 300);
+            }
+        }
+
+        function hideAllScreens() {
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+        }
+
+        function showScreen(screenId) {
+            hideAllScreens();
+            stopTimer(); // Ensure timer stops on screen change
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+        }
+
+        function goHome() {
+            stopTimer();
+            if (STATE.wrongTimeout) clearTimeout(STATE.wrongTimeout);
+            showScreen('home');
+        }
+
+        function showResetModal() {
+            document.getElementById('resetModal').classList.remove('hidden');
+        }
+        
+        function hideResetModal() {
+            document.getElementById('resetModal').classList.add('hidden');
+        }
+
+        function resetData() {
+            localStorage.removeItem('kidsLearning_name');
+            localStorage.removeItem('kidsLearning_stars');
+            location.reload(); 
+        }
+
+        function closeTestModal() {
+            document.getElementById('testEndModal').classList.add('hidden');
+            goHome();
+        }
+
+        // --- Game Setup ---
+        function startSubject(subject, mode) {
+            STATE.currentSubject = subject;
+            STATE.currentMode = mode;
+            STATE.testScore = 0;
+            STATE.isAnswering = false;
+            STATE.isPaused = false;
+
+            const gameScreen = document.getElementById('screen-game');
+            const textContainer = document.getElementById('textQuestionContainer');
+            const clockContainer = document.getElementById('clockContainer');
+            const timerContainer = document.getElementById('timerContainer');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const gameModeTitle = document.getElementById('gameModeTitle');
+
+            // Reset containers
+            textContainer.classList.add('hidden');
+            clockContainer.classList.add('hidden');
+
+            let titleText = '';
+
+            // Setup UI based on Subject
+            if (subject === 'math') {
+                gameScreen.className = 'w-full max-w-xl mx-auto bg-white rounded-3xl p-6 md:p-8 shadow-xl border-t-8 border-green-500';
+                textContainer.classList.remove('hidden');
+                document.getElementById('mainQuestionText').setAttribute('dir', 'ltr'); // LTR for Math
+                titleText = '🧮 חשבון';
+            } else {
+                gameScreen.className = 'w-full max-w-xl mx-auto bg-white rounded-3xl p-6 md:p-8 shadow-xl border-t-8 border-blue-500';
+                
+                if (subject === 'clock_l1') titleText = '⏰ שעון 24 שעות';
+                if (subject === 'clock_l2') titleText = '⏰ הבנת דקות';
+                if (subject === 'clock_l3') titleText = '⏰ שעון מחוגים';
+
+                if (subject === 'clock_l3') {
+                    clockContainer.classList.remove('hidden'); // Analog Clock
+                } else {
+                    textContainer.classList.remove('hidden'); // Text (24h or minutes)
+                    document.getElementById('mainQuestionText').setAttribute('dir', 'rtl'); 
+                    if(subject === 'clock_l1') document.getElementById('mainQuestionText').setAttribute('dir', 'ltr'); // 15:00
+                }
+            }
+
+            // Setup Mode (Practice / Test)
+            if (mode === 'test') {
+                timerContainer.classList.remove('hidden');
+                scoreDisplay.classList.remove('hidden');
+                document.getElementById('correctAnswersCount').textContent = '0';
+                gameModeTitle.innerHTML = titleText + '<span class="text-sm font-normal bg-red-100 text-red-700 px-2 py-1 rounded mr-2 inline-block">מבחן</span>';
+                startTimer();
+            } else {
+                timerContainer.classList.add('hidden');
+                scoreDisplay.classList.add('hidden');
+                gameModeTitle.innerHTML = titleText + '<span class="text-sm font-normal bg-green-100 text-green-700 px-2 py-1 rounded mr-2 inline-block">תרגול</span>';
+            }
+
+            clearFeedback();
+            generateNextQuestion();
+            showScreen('game');
+        }
+
+        // --- Robust Timer Logic ---
+        function stopTimer() {
+            if (gameInterval !== null) {
+                window.clearInterval(gameInterval);
+                gameInterval = null;
+            }
+        }
+
+        function startTimer() {
+            stopTimer(); // Always clear previous before starting new
+            STATE.timeLeft = STATE.totalTime;
+            STATE.isPaused = false;
+            updateTimerUI();
+            
+            gameInterval = window.setInterval(() => {
+                if (!STATE.isPaused) {
+                    STATE.timeLeft--;
+                    updateTimerUI();
+                    
+                    if (STATE.timeLeft <= 0) {
+                        stopTimer();
+                        endTest();
+                    }
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const timerText = document.getElementById('timerText');
+            const timerBar = document.getElementById('timerBar');
+            
+            timerText.textContent = `${STATE.timeLeft} שניות`;
+            
+            // Percentage for the bar
+            const percentage = (STATE.timeLeft / STATE.totalTime) * 100;
+            timerBar.style.width = `${Math.max(percentage, 0)}%`;
+
+            // Color changes on low time
+            if (STATE.timeLeft <= 10) {
+                timerText.classList.add('animate-pulse', 'text-red-600', 'font-extrabold');
+                timerBar.classList.remove('bg-red-500');
+                timerBar.classList.add('bg-red-600');
+            } else {
+                timerText.classList.remove('animate-pulse', 'text-red-600', 'font-extrabold');
+                timerBar.classList.remove('bg-red-600');
+                timerBar.classList.add('bg-red-500');
+            }
+        }
+
+        function endTest() {
+            stopTimer();
+            // In the modal, show the score for THIS session
+            document.getElementById('finalScoreText').textContent = STATE.testScore;
+            document.getElementById('earnedStarsText').textContent = STATE.testScore;
+            
+            document.getElementById('testEndModal').classList.remove('hidden');
+        }
+
+        // --- Question Generation Logic ---
+        function generateNextQuestion() {
+            STATE.isAnswering = false;
+            let questionData;
+
+            if (STATE.currentSubject === 'math') {
+                questionData = generateMathQuestion();
+                document.getElementById('mainQuestionText').innerHTML = questionData.qText;
+            } else if (STATE.currentSubject === 'clock_l1') {
+                questionData = generateClockL1();
+                document.getElementById('mainQuestionText').innerHTML = questionData.qText;
+            } else if (STATE.currentSubject === 'clock_l2') {
+                questionData = generateClockL2();
+                document.getElementById('mainQuestionText').innerHTML = questionData.qText;
+            } else if (STATE.currentSubject === 'clock_l3') {
+                questionData = generateClockL3();
+                setAnalogClock(questionData.h, questionData.m);
+            }
+
+            STATE.currentCorrectAnswer = questionData.answer;
+            STATE.currentExplanation = questionData.explanation; // Save explanation!
+            const options = generateOptions(questionData.answer, STATE.currentSubject, questionData);
+            renderOptions(options);
+        }
+
+        // --- 1. Math Generator ---
+        function generateMathQuestion() {
+            const isAdd = Math.random() > 0.5;
+            let a, b, answer;
+
+            if (isAdd) {
+                answer = Math.floor(Math.random() * 21); // 0 to 20
+                a = Math.floor(Math.random() * (answer + 1));
+                b = answer - a;
+                return { 
+                    qText: `${a} + ${b} = ?`, 
+                    answer: answer.toString(), 
+                    type: 'math',
+                    explanation: `התשובה הנכונה היא ${answer}, כי ${a} ועוד ${b} שווה בדיוק ${answer}.`
+                };
+            } else {
+                a = Math.floor(Math.random() * 21); 
+                b = Math.floor(Math.random() * (a + 1));
+                answer = a - b;
+                return { 
+                    qText: `${a} - ${b} = ?`, 
+                    answer: answer.toString(), 
+                    type: 'math',
+                    explanation: `התשובה הנכונה היא ${answer}, כי ${a} פחות ${b} שווה בדיוק ${answer}.`
+                };
+            }
+        }
+
+        // --- 2. Clock Level 1: 24h format ---
+        function generateClockL1() {
+            const h24 = Math.floor(Math.random() * 11) + 13; 
+            const h12 = h24 - 12;
+            
+            let timeStr = "";
+            if(h24 >= 13 && h24 <= 15) timeStr = "בצהריים";
+            else if(h24 >= 16 && h24 <= 19) timeStr = "אחר הצהריים";
+            else timeStr = "בערב";
+
+            return { 
+                qText: `${h24}:00`, 
+                answer: `${h12} ${timeStr}`,
+                h12: h12, 
+                timeStr: timeStr,
+                type: 'clock_l1',
+                explanation: `כשרואים שעה גדולה מ-12, מחסירים ממנה 12 כדי לדעת את השעה. (${h24} פחות 12 זה ${h12}).`
+            };
+        }
+
+        // --- 3. Clock Level 2: Minutes Concept ---
+        function generateClockL2() {
+            const minutesList = [
+                { min: 15, text: "15 דקות", ans: "רבע שעה", exp: "בשעה שלמה יש 60 דקות. 15 דקות הן בדיוק רבע מתוך השעה השלמה!" },
+                { min: 30, text: "30 דקות", ans: "חצי שעה", exp: "בשעה שלמה יש 60 דקות. 30 דקות הן בדיוק חצי משעה שלמה!" },
+                { min: 45, text: "45 דקות", ans: "שלושת רבעי שעה", exp: "45 דקות מורכבות מ-3 רבעים של 15 דקות (15+15+15), לכן קוראים לזה שלושת רבעי שעה." },
+                { min: 60, text: "60 דקות", ans: "שעה שלמה", exp: "תמיד זוכרים: שעה אחת שלמה מורכבת מ-60 דקות בדיוק." }
+            ];
+            const choice = minutesList[Math.floor(Math.random() * minutesList.length)];
+            
+            return {
+                qText: choice.text,
+                answer: choice.ans,
+                type: 'clock_l2',
+                explanation: choice.exp
+            };
+        }
+
+        // --- 4. Clock Level 3: Analog Clock ---
+        function getHebrewTimeText(h, m) {
+            if (m === 0) return `שעה ${h}`;
+            if (m === 15) return `שעה ${h} ורבע`;
+            if (m === 30) return `שעה ${h} וחצי`;
+            if (m === 45) {
+                let nextHour = (h === 12) ? 1 : h + 1;
+                return `רבע ל-${nextHour}`;
+            }
+            return `שעה ${h}`;
+        }
+
+        function generateClockL3() {
+            const h = Math.floor(Math.random() * 12) + 1; 
+            const minOptions = [0, 15, 30, 45];
+            const m = minOptions[Math.floor(Math.random() * minOptions.length)];
+            
+            const answerText = getHebrewTimeText(h, m);
+            
+            let expMinute = "";
+            if (m === 0) expMinute = "מצביע על 12 (שעה עגולה)";
+            if (m === 15) expMinute = "מצביע על 3 (שזה 15 דקות, רבע שעה)";
+            if (m === 30) expMinute = "מצביע על 6 (שזה 30 דקות, חצי שעה)";
+            if (m === 45) expMinute = "מצביע על 9 (שזה 45 דקות, ולכן חסר רבע לשעה הבאה)";
+
+            let expText = `המחוג הקצר (שעות) נמצא על ${h}, והמחוג הארוך (דקות) ${expMinute}. לכן השעה היא ${answerText}.`;
+
+            return { h, m, answer: answerText, type: 'clock_l3', explanation: expText };
+        }
+
+        // --- Answer Options Generator ---
+        function generateOptions(correctAnswer, subject, questionData) {
+            let options = [correctAnswer];
+            
+            while (options.length < 4) {
+                let wrong;
+                
+                if (subject === 'math') {
+                    let numCorrect = parseInt(correctAnswer);
+                    let deviation = Math.floor(Math.random() * 7) - 3;
+                    if (deviation === 0) deviation = 2;
+                    wrong = numCorrect + deviation;
+                    if (wrong < 0) wrong = 0;
+                    if (wrong > 25) wrong = 20; 
+                    wrong = wrong.toString();
+                } 
+                else if (subject === 'clock_l1') {
+                    let wrongH12 = Math.floor(Math.random() * 11) + 1;
+                    if(wrongH12 === questionData.h12) wrongH12 = (wrongH12 % 12) + 1;
+                    wrong = `${wrongH12} ${questionData.timeStr}`;
+                    
+                    if(Math.random() > 0.6) {
+                        const times = ["בצהריים", "אחר הצהריים", "בערב", "בבוקר"];
+                        let wrongTime = times[Math.floor(Math.random() * times.length)];
+                        wrong = `${questionData.h12} ${wrongTime}`;
+                    }
+                }
+                else if (subject === 'clock_l2') {
+                    const allAnswers = ["רבע שעה", "חצי שעה", "שלושת רבעי שעה", "שעה שלמה", "עשרים דקות"];
+                    wrong = allAnswers[Math.floor(Math.random() * allAnswers.length)];
+                }
+                else if (subject === 'clock_l3') {
+                    const minOptions = [0, 15, 30, 45];
+                    let wrongH = Math.floor(Math.random() * 12) + 1;
+                    let wrongM = minOptions[Math.floor(Math.random() * minOptions.length)];
+                    
+                    if (Math.random() > 0.5) wrongH = questionData.h; 
+                    
+                    wrong = getHebrewTimeText(wrongH, wrongM);
+                }
+                
+                if (!options.includes(wrong)) {
+                    options.push(wrong);
+                }
+            }
+
+            return options.sort(() => Math.random() - 0.5);
+        }
+
+        function renderOptions(options) {
+            const grid = document.getElementById('optionsGrid');
+            grid.innerHTML = '';
+            
+            const btnColorClass = STATE.currentSubject === 'math' ? 'bg-green-100 hover:bg-green-200 text-green-900 border-green-300' : 'bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300';
+            
+            const isTextLong = STATE.currentSubject.startsWith('clock');
+            const textSize = isTextLong ? 'text-lg md:text-xl' : 'text-3xl md:text-4xl';
+
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn ${btnColorClass} ${textSize} border-b-4 font-extrabold py-4 md:py-6 rounded-2xl transition-all transform active:scale-95 active:border-b-0 active:translate-y-1`;
+                
+                if (STATE.currentSubject === 'math') btn.setAttribute('dir', 'ltr');
+                
+                btn.textContent = opt;
+                btn.onclick = () => handleAnswer(opt, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        // --- Analog Clock Drawing ---
+        function generateClockTicks() {
+            const clock = document.getElementById('analogClock');
+            for (let i = 0; i < 12; i++) {
+                const tick = document.createElement('div');
+                tick.className = `clock-tick ${i % 3 === 0 ? 'main' : ''}`;
+                tick.style.transform = `rotate(${i * 30}deg)`;
+                clock.appendChild(tick);
+            }
+        }
+
+        function setAnalogClock(h, m) {
+            const hourHand = document.getElementById('hourHand');
+            const minuteHand = document.getElementById('minuteHand');
+            
+            const minuteAngle = m * 6;
+            const hourAngle = (h % 12) * 30 + (m * 0.5);
+
+            minuteHand.style.transform = `rotate(${minuteAngle}deg)`;
+            hourHand.style.transform = `rotate(${hourAngle}deg)`;
+        }
+
+        // --- Game Interaction & Feedback Logic ---
+        function handleAnswer(selected, buttonElement) {
+            if (STATE.isAnswering) return;
+            STATE.isAnswering = true;
+
+            const isCorrect = (selected === STATE.currentCorrectAnswer);
+            
+            if (isCorrect) {
+                // הצלחה
+                buttonElement.classList.remove('bg-green-100', 'bg-blue-100', 'border-green-300', 'border-blue-300');
+                buttonElement.classList.add('bg-yellow-400', 'border-yellow-500', 'text-white', 'animate-bounce-sm');
+                
+                showFeedback('כל הכבוד! 🎉 תשובה נכונה!', 'text-green-600', false);
+                
+                if (STATE.currentMode === 'test') {
+                    STATE.testScore++;
+                    document.getElementById('correctAnswersCount').textContent = STATE.testScore;
+                    saveStars(1); // עדכון כוכבים חי!
+                }
+                
+                setTimeout(() => { clearFeedback(); generateNextQuestion(); }, 1000);
+
+            } else {
+                // טעות
+                STATE.isPaused = true; // הקפאת הטיימר כדי שיוכלו לקרוא בנחת
+
+                // 1. צביעת הכפתור השגוי שנלחץ באדום
+                buttonElement.classList.remove('bg-green-100', 'bg-blue-100', 'border-green-300', 'border-blue-300');
+                buttonElement.classList.add('bg-red-500', 'border-red-600', 'text-white', 'animate-shake');
+                
+                // 2. חסימת כל הכפתורים וצביעת הכפתור הנכון בירוק בולט
+                const buttons = document.querySelectorAll('.option-btn');
+                buttons.forEach(btn => {
+                    btn.onclick = null; // מניעת לחיצות נוספות
+                    btn.classList.remove('active:scale-95', 'active:translate-y-1', 'active:border-b-0', 'hover:bg-green-200', 'hover:bg-blue-200');
+                    
+                    if (btn.textContent === STATE.currentCorrectAnswer) {
+                        // זו התשובה הנכונה!
+                        btn.classList.remove('bg-green-100', 'bg-blue-100', 'border-green-300', 'border-blue-300', 'text-green-900', 'text-blue-900');
+                        btn.classList.add('bg-green-500', 'border-green-600', 'text-white', 'animate-pulse');
+                    } else if (btn !== buttonElement) {
+                        // לעמעם את שאר האפשרויות השגויות שלא נלחצו
+                        btn.classList.add('opacity-40');
+                    }
+                });
+
+                // 3. הצגת משוב והסבר עם כפתור המשך
+                showFeedback(`אופס, טעינו. <strong>${STATE.currentExplanation}</strong>`, 'text-red-600', true);
+                
+                // 4. מעבר אוטומטי אם הילד לא לחץ על "המשך" (אחרי 6 שניות)
+                STATE.wrongTimeout = setTimeout(() => {
+                    STATE.isPaused = false;
+                    clearFeedback();
+                    generateNextQuestion();
+                }, 6000);
+            }
+        }
+
+        function showFeedback(text, colorClass, showContinueBtn = false) {
+            const msgContainer = document.getElementById('feedbackMessage');
+            
+            // הגדרת עיצוב המכל של ההודעה
+            msgContainer.className = `text-lg md:text-xl font-medium text-center mt-6 min-h-[80px] transition-opacity duration-300 opacity-100 flex flex-col items-center justify-center gap-3 ${colorClass}`;
+            
+            // הכנסת הטקסט (ההסבר)
+            msgContainer.innerHTML = `<span>${text}</span>`;
+            
+            // הוספת כפתור "המשך" אם מדובר בטעות
+            if (showContinueBtn) {
+                const btn = document.createElement('button');
+                btn.innerHTML = 'הבנתי, לשאלה הבאה <span class="text-xl leading-none">&larr;</span>';
+                btn.className = "mt-1 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2 px-6 rounded-xl shadow-sm transition-transform active:scale-95 cursor-pointer";
+                
+                // לחיצה על כפתור המשך מדלגת על הטיימר וממשיכה מיד
+                btn.onclick = () => {
+                    if (STATE.wrongTimeout) clearTimeout(STATE.wrongTimeout);
+                    STATE.isPaused = false;
+                    clearFeedback();
+                    generateNextQuestion();
+                };
+                msgContainer.appendChild(btn);
+            }
+        }
+
+        function clearFeedback() {
+            const msgContainer = document.getElementById('feedbackMessage');
+            msgContainer.classList.remove('opacity-100');
+            msgContainer.classList.add('opacity-0');
+        }
+
+    </script>
+</body>
+</html>
