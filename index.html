@@ -162,8 +162,10 @@
         } else {
             // 🛑 הוסף את ה-firebaseConfig שלך כאן עבור GitHub 🛑
             // החלף את כל האובייקט הזה במה שקיבלת מה-Firebase שלך!
+            // הערה: יש להגדיר משתני סביבה ב-GitHub או במערכת ה-Hosting שלך
+            // כדי למנוע חשיפה של ה-API Key.
             firebaseConfig = {
-                apiKey: "AIzaSyB9ATc7fsyds8e-zLiQuN8vCo9-CfnO6C0",
+                apiKey: window.env?.FIREBASE_API_KEY || "AIzaSyB9ATc7fsyds8e-zLiQuN8vCo9-CfnO6C0", // <-- השארת ה-API כגיבוי רק אם משתנה הסביבה לא זמין
                 authDomain: "kids-portal-bd.firebaseapp.com",
                 projectId: "kids-portal-bd",
                 storageBucket: "kids-portal-bd.firebasestorage.app",
