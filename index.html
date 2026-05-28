@@ -154,11 +154,32 @@
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // === הגדרות ענן וחיבור למסד הנתונים ===
-        const firebaseConfig = JSON.parse(__firebase_config);
+        
+        let firebaseConfig;
+        if (typeof __firebase_config !== 'undefined') {
+            // התחברות אוטומטית לסביבת התצוגה המקדימה (כדי שלא תקפוץ שגיאה כאן)
+            firebaseConfig = JSON.parse(__firebase_config);
+        } else {
+            // 🛑 הוסף את ה-firebaseConfig שלך כאן עבור GitHub 🛑
+            // החלף את כל האובייקט הזה במה שקיבלת מה-Firebase שלך!
+            firebaseConfig = {
+                apiKey: "AIzaSyB9ATc7fsyds8e-zLiQuN8vCo9-CfnO6C0",
+                authDomain: "kids-portal-bd.firebaseapp.com",
+                projectId: "kids-portal-bd",
+                storageBucket: "kids-portal-bd.firebasestorage.app",
+                messagingSenderId: "881195401114",
+                appId: "1:881195401114:web:2c3bfe6bb02ce9d51f0423",
+                measurementId: "G-FN2JNYHZTJ"
+            };
+        }
+
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kids-portal-default';
+        
+        // מזהה קבוע לאפליקציה ב-Firestore
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kids-portal-main'; 
+        
         let currentUser = null;
         let unsubscribeDb = null;
 
@@ -168,16 +189,17 @@
 
         // === אתחול האפליקציה והתחברות לענן ===
         async function init() {
-            // התחברות אנונימית ראשונית כדי לקבל הרשאות קריאה/כתיבה למסד הנתונים
-            const initAuth = async () => {
+            // התחברות
+            try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
-            };
-            
-            await initAuth();
+            } catch (error) {
+                console.error("שגיאה בהתחברות ל-Firebase:", error);
+                showToast("ישנה בעיה בהתחברות לשרת, נסה לרענן את העמוד.");
+            }
 
             // האזנה לשינויים במצב ההתחברות
             onAuthStateChanged(auth, (user) => {
@@ -211,6 +233,9 @@
                     currentApps.push({ id: doc.id, ...doc.data() });
                 });
                 
+                // סידור האפליקציות לפי תאריך יצירה (החדש ביותר בסוף)
+                currentApps.sort((a, b) => a.createdAt - b.createdAt);
+
                 // עדכון התצוגה בכל פעם שיש שינוי בענן
                 renderPortal();
                 
@@ -220,7 +245,6 @@
                 }
             }, (error) => {
                 console.error("שגיאה בהורדת נתונים מהענן:", error);
-                showToast("שגיאה בטעינת הכלים מהענן");
             });
         }
 
@@ -293,7 +317,7 @@
                     <td class="p-3 text-3xl text-center w-16">${appItem.icon}</td>
                     <td class="p-3 font-bold text-gray-800">${appItem.name}</td>
                     <td class="p-3 text-left dir-ltr w-1/2">
-                        <div class="truncate max-w-xs text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100">
+                        <div class="truncate max-w-xs text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100" dir="ltr">
                             ${appItem.url}
                         </div>
                     </td>
@@ -309,7 +333,10 @@
 
         // === פונקציות אדמין - כתיבה לענן ===
         async function addNewApp() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                showToast("מתחבר לשרת, אנא המתן שניה ונסה שוב.");
+                return;
+            }
 
             const nameInput = document.getElementById('new-app-name');
             const iconInput = document.getElementById('new-app-icon');
