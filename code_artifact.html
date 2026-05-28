@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הפורטל של הילדים</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;800&display=swap');
+        
+        body {
+            font-family: 'Heebo', sans-serif;
+            background-color: #f0f9ff;
+            background-image: radial-gradient(#bae6fd 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* צבעים מתחלפים לכרטיסיות */
+        .color-0 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .color-1 { background: linear-gradient(135deg, #10b981, #059669); }
+        .color-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
+        .color-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .color-4 { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .color-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- מסך ראשי (פורטל ילדים) -->
+    <div id="portal-screen" class="flex-1 flex flex-col items-center p-6 w-full max-w-5xl mx-auto">
+        
+        <!-- כפתור אדמין מוסתר בפינה -->
+        <div class="w-full flex justify-end mb-4">
+            <button onclick="openLoginModal()" class="text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-200" title="פאנל ניהול (להורים)">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+        </div>
+
+        <header class="text-center mb-10">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-blue-600 drop-shadow-md mb-2">מרכז הלימודים שלנו 🚀</h1>
+            <p class="text-xl text-gray-600 font-semibold">איזה נושא נרצה לתרגל היום?</p>
+        </header>
+
+        <!-- רשת האפליקציות -->
+        <div id="apps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+            <!-- התוכן יוזרק לכאן דרך JS -->
+        </div>
+
+    </div>
+
+    <!-- מסך פאנל ניהול (אדמין) -->
+    <div id="admin-screen" class="hidden flex-1 flex flex-col p-6 w-full max-w-4xl mx-auto">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full border-t-8 border-gray-800">
+            <div class="flex justify-between items-center mb-8 pb-4 border-b-2 border-gray-100">
+                <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
+                    <span>⚙️</span> פאנל ניהול אפליקציות
+                </h2>
+                <button onclick="showScreen('portal')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition-colors">
+                    חזרה לפורטל <span class="text-xl">🏠</span>
+                </button>
+            </div>
+
+            <!-- טופס הוספת אפליקציה חדשה -->
+            <div class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
+                <h3 class="text-xl font-bold text-gray-700 mb-4">➕ הוספת משחק / כלי חדש</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">שם האפליקציה (למשל: חשבון)</label>
+                        <input type="text" id="new-app-name" placeholder="הכנס שם..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">אימוג'י / סמל (למשל: 🧮)</label>
+                        <input type="text" id="new-app-icon" placeholder="הדבק אימוג'י..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">קישור (URL ב-GitHub Pages)</label>
+                        <input type="text" id="new-app-url" placeholder="https://..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none dir-ltr" dir="ltr">
+                    </div>
+                </div>
+                <div class="mt-4 flex justify-end">
+                    <button onclick="addNewApp()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors">
+                        שמור והוסף לפורטל
+                    </button>
+                </div>
+                <p id="admin-error" class="text-red-500 mt-2 text-sm font-semibold hidden"></p>
+            </div>
+
+            <!-- רשימת האפליקציות הקיימות -->
+            <div>
+                <h3 class="text-xl font-bold text-gray-700 mb-4">📋 אפליקציות קיימות בפורטל:</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right border-collapse">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600">
+                                <th class="p-3 rounded-tr-lg">סמל</th>
+                                <th class="p-3">שם האפליקציה</th>
+                                <th class="p-3">קישור (URL)</th>
+                                <th class="p-3 rounded-tl-lg text-center">פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-apps-list">
+                            <!-- יוזרק מ-JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- מודאל התחברות לאדמין -->
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300" id="login-modal-content">
+            <div class="text-center mb-6">
+                <span class="text-4xl mb-2 block">🔒</span>
+                <h3 class="text-2xl font-bold text-gray-800">כניסת הורים</h3>
+                <p class="text-gray-500 text-sm mt-1">אנא הכנס את קוד הגישה לפאנל הניהול</p>
+            </div>
+            
+            <input type="password" id="admin-pin" placeholder="קוד סודי (1234)" class="w-full text-center text-2xl tracking-widest px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none mb-4 dir-ltr" dir="ltr" inputmode="numeric">
+            
+            <p id="login-error" class="text-red-500 text-center text-sm mb-4 font-semibold hidden">קוד שגוי, נסה שוב.</p>
+            
+            <div class="flex gap-3">
+                <button onclick="closeLoginModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl transition-colors">
+                    ביטול
+                </button>
+                <button onclick="checkPin()" class="flex-1 bg-gray-800 hover:bg-black text-white font-bold py-3 px-4 rounded-xl shadow-md transition-colors">
+                    כניסה
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- הודעת אישור (Toast) -->
+    <div id="toast-message" class="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        הפעולה בוצעה בהצלחה!
+    </div>
+
+    <script>
+        // === נתונים והגדרות ===
+        
+        // סיסמת כניסה לפאנל (אפשר לשנות כאן)
+        const ADMIN_PIN = "1234"; 
+
+        // מפתח השמירה בזיכרון המקומי
+        const STORAGE_KEY = "kids_portal_apps";
+
+        // רשימת האפליקציות ההתחלתית (אם אין כלום בזיכרון)
+        const defaultApps = [
+            {
+                id: generateId(),
+                name: "אנגלית",
+                icon: "🇬🇧",
+                url: "#", // כאן תשים את הקישור האמיתי לקובץ האנגלית שלך
+            },
+            {
+                id: generateId(),
+                name: "חשבון ושעון",
+                icon: "⏰",
+                url: "#", // כאן תשים את הקישור האמיתי לקובץ החשבון והשעון
+            }
+        ];
+
+        let currentApps = [];
+
+        // === פונקציות אתחול וניהול נתונים ===
+
+        function init() {
+            loadAppsFromStorage();
+            renderPortal();
+            
+            // הוספת האזנה למקש אנטר במסך ההתחברות
+            document.getElementById('admin-pin').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    checkPin();
+                }
+            });
+        }
+
+        function loadAppsFromStorage() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                currentApps = JSON.parse(saved);
+            } else {
+                currentApps = [...defaultApps];
+                saveAppsToStorage();
+            }
+        }
+
+        function saveAppsToStorage() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentApps));
+        }
+
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        // === ניהול תצוגה (UI) ===
+
+        function showScreen(screenName) {
+            document.getElementById('portal-screen').classList.add('hidden');
+            document.getElementById('admin-screen').classList.add('hidden');
+            
+            if (screenName === 'portal') {
+                renderPortal();
+                document.getElementById('portal-screen').classList.remove('hidden');
+            } else if (screenName === 'admin') {
+                renderAdminTable();
+                document.getElementById('admin-screen').classList.remove('hidden');
+            }
+        }
+
+        // רינדור הפורטל לילדים
+        function renderPortal() {
+            const grid = document.getElementById('apps-grid');
+            grid.innerHTML = '';
+
+            if (currentApps.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-500 mt-10 text-xl font-bold">עדיין לא הוספו משחקים. בקשו מההורים להוסיף דרך פאנל הניהול! 🛠️</div>`;
+                return;
+            }
+
+            currentApps.forEach((app, index) => {
+                // מחזור צבעים לכרטיסיות
+                const colorClass = `color-${index % 6}`; 
+                
+                const card = document.createElement('a');
+                card.href = app.url;
+                card.className = `tool-card ${colorClass} text-white rounded-3xl p-8 flex flex-col items-center justify-center text-center gap-4 cursor-pointer no-underline block`;
+                // אם אין קישור אמיתי, נמנע מעבר דף סתם
+                if(app.url === "#" || app.url === "") {
+                    card.onclick = (e) => {
+                        e.preventDefault();
+                        showToast("עדיין לא הוגדר קישור לאפליקציה זו. כנסו לאדמין לעדכן!");
+                    }
+                }
+
+                card.innerHTML = `
+                    <span class="text-7xl drop-shadow-lg">${app.icon || '⭐'}</span>
+                    <h2 class="text-3xl font-extrabold drop-shadow-md">${app.name}</h2>
+                    <div class="mt-2 bg-white bg-opacity-20 px-6 py-2 rounded-full font-semibold text-lg flex items-center gap-2">
+                        כניסה <span>▶</span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // רינדור טבלת האדמין
+        function renderAdminTable() {
+            const list = document.getElementById('admin-apps-list');
+            list.innerHTML = '';
+
+            if (currentApps.length === 0) {
+                list.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">אין אפליקציות מוגדרות.</td></tr>`;
+                return;
+            }
+
+            currentApps.forEach(app => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-gray-100 hover:bg-gray-50";
+                
+                tr.innerHTML = `
+                    <td class="p-3 text-3xl text-center w-16">${app.icon}</td>
+                    <td class="p-3 font-bold text-gray-800">${app.name}</td>
+                    <td class="p-3 text-left dir-ltr w-1/2">
+                        <div class="truncate max-w-xs text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100">
+                            ${app.url}
+                        </div>
+                    </td>
+                    <td class="p-3 text-center">
+                        <button onclick="deleteApp('${app.id}')" class="text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-bold py-1 px-3 rounded transition-colors text-sm">
+                            מחק 🗑️
+                        </button>
+                    </td>
+                `;
+                list.appendChild(tr);
+            });
+        }
+
+        // === פונקציות אדמין (הוספה / מחיקה) ===
+
+        function addNewApp() {
+            const nameInput = document.getElementById('new-app-name');
+            const iconInput = document.getElementById('new-app-icon');
+            const urlInput = document.getElementById('new-app-url');
+            const errorMsg = document.getElementById('admin-error');
+
+            const name = nameInput.value.trim();
+            const icon = iconInput.value.trim() || '⭐';
+            const url = urlInput.value.trim();
+
+            if (!name || !url) {
+                errorMsg.textContent = "חובה להזין שם וקישור URL.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            errorMsg.classList.add('hidden');
+
+            const newApp = {
+                id: generateId(),
+                name: name,
+                icon: icon,
+                url: url
+            };
+
+            currentApps.push(newApp);
+            saveAppsToStorage();
+            
+            // ניקוי הטופס
+            nameInput.value = '';
+            iconInput.value = '';
+            urlInput.value = '';
+
+            renderAdminTable();
+            showToast("האפליקציה נוספה בהצלחה!");
+        }
+
+        function deleteApp(id) {
+            // יצירת חלונית אישור מותאמת (לא alert רגיל)
+            if(confirm("האם למחוק את האפליקציה מהפורטל?")) {
+                currentApps = currentApps.filter(app => app.id !== id);
+                saveAppsToStorage();
+                renderAdminTable();
+                showToast("האפליקציה נמחקה.");
+            }
+        }
+
+        // === מערכת התחברות (מודאל) ===
+
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+            const input = document.getElementById('admin-pin');
+            
+            input.value = '';
+            document.getElementById('login-error').classList.add('hidden');
+            
+            modal.classList.remove('hidden');
+            // Timeout קצר כדי לאפשר לאנימציית ה-CSS לעבוד
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                content.classList.remove('scale-95');
+                input.focus();
+            }, 10);
+        }
+
+        function closeLoginModal() {
+            const modal = document.getElementById('login-modal');
+            const content = document.getElementById('login-modal-content');
+            
+            modal.classList.add('opacity-0');
+            content.classList.add('scale-95');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        function checkPin() {
+            const input = document.getElementById('admin-pin').value;
+            const errorMsg = document.getElementById('login-error');
+            
+            if (input === ADMIN_PIN) {
+                closeLoginModal();
+                showScreen('admin');
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('admin-pin').value = '';
+                document.getElementById('admin-pin').focus();
+            }
+        }
+
+        // === הודעות (Toasts) ===
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            toast.textContent = message;
+            
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // הפעלת האפליקציה בטעינה
+        window.onload = init;
+
+    </script>
+</body>
+</html>
