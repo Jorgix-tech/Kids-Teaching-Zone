@@ -128,7 +128,7 @@
                 <p class="text-gray-500 text-sm mt-1">אנא הכנס את קוד הגישה לפאנל הניהול</p>
             </div>
             
-            <input type="password" id="admin-pin" placeholder="קוד סודי" class="w-full text-center text-2xl tracking-widest px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none mb-4 dir-ltr" dir="ltr" inputmode="numeric">
+            <input type="password" id="admin-pin" placeholder="קוד סודי (1234)" class="w-full text-center text-2xl tracking-widest px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:outline-none mb-4 dir-ltr" dir="ltr" inputmode="numeric">
             
             <p id="login-error" class="text-red-500 text-center text-sm mb-4 font-semibold hidden">קוד שגוי, נסה שוב.</p>
             
@@ -148,38 +148,46 @@
         הפעולה בוצעה בהצלחה!
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // === הגדרות ענן וחיבור למסד הנתונים ===
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'kids-portal-default';
+        let currentUser = null;
+        let unsubscribeDb = null;
+
         // === נתונים והגדרות ===
-        
-        // סיסמת כניסה לפאנל (אפשר לשנות כאן)
-        const ADMIN_PIN = "1122"; 
-
-        // מפתח השמירה בזיכרון המקומי
-        const STORAGE_KEY = "kids_portal_apps";
-
-        // רשימת האפליקציות ההתחלתית (אם אין כלום בזיכרון)
-        const defaultApps = [
-            {
-                id: generateId(),
-                name: "אנגלית",
-                icon: "🇬🇧",
-                url: "#", // כאן תשים את הקישור האמיתי לקובץ האנגלית שלך
-            },
-            {
-                id: generateId(),
-                name: "חשבון ושעון",
-                icon: "⏰",
-                url: "#", // כאן תשים את הקישור האמיתי לקובץ החשבון והשעון
-            }
-        ];
-
+        const ADMIN_PIN = "1234"; // סיסמת כניסה לפאנל
         let currentApps = [];
 
-        // === פונקציות אתחול וניהול נתונים ===
+        // === אתחול האפליקציה והתחברות לענן ===
+        async function init() {
+            // התחברות אנונימית ראשונית כדי לקבל הרשאות קריאה/כתיבה למסד הנתונים
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            
+            await initAuth();
 
-        function init() {
-            loadAppsFromStorage();
-            renderPortal();
+            // האזנה לשינויים במצב ההתחברות
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    setupDatabaseListener();
+                } else {
+                    if (unsubscribeDb) unsubscribeDb();
+                }
+            });
             
             // הוספת האזנה למקש אנטר במסך ההתחברות
             document.getElementById('admin-pin').addEventListener('keypress', function (e) {
@@ -189,18 +197,31 @@
             });
         }
 
-        function loadAppsFromStorage() {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                currentApps = JSON.parse(saved);
-            } else {
-                currentApps = [...defaultApps];
-                saveAppsToStorage();
-            }
-        }
+        // === האזנה לנתונים בזמן אמת מהענן ===
+        function setupDatabaseListener() {
+            if (!currentUser) return;
 
-        function saveAppsToStorage() {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(currentApps));
+            // נתיב ציבורי משותף לכל המכשירים של הפורטל הזה
+            const appsRef = collection(db, 'artifacts', appId, 'public', 'data', 'apps');
+            
+            // onSnapshot מאזין בזמן אמת לכל שינוי בענן!
+            unsubscribeDb = onSnapshot(appsRef, (snapshot) => {
+                currentApps = [];
+                snapshot.forEach((doc) => {
+                    currentApps.push({ id: doc.id, ...doc.data() });
+                });
+                
+                // עדכון התצוגה בכל פעם שיש שינוי בענן
+                renderPortal();
+                
+                // אם פאנל האדמין פתוח, נרענן גם אותו
+                if (!document.getElementById('admin-screen').classList.contains('hidden')) {
+                    renderAdminTable();
+                }
+            }, (error) => {
+                console.error("שגיאה בהורדת נתונים מהענן:", error);
+                showToast("שגיאה בטעינת הכלים מהענן");
+            });
         }
 
         function generateId() {
@@ -208,7 +229,6 @@
         }
 
         // === ניהול תצוגה (UI) ===
-
         function showScreen(screenName) {
             document.getElementById('portal-screen').classList.add('hidden');
             document.getElementById('admin-screen').classList.add('hidden');
@@ -222,25 +242,23 @@
             }
         }
 
-        // רינדור הפורטל לילדים
         function renderPortal() {
             const grid = document.getElementById('apps-grid');
             grid.innerHTML = '';
 
             if (currentApps.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-500 mt-10 text-xl font-bold">עדיין לא הוספו משחקים. בקשו מההורים להוסיף דרך פאנל הניהול! 🛠️</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center text-gray-500 mt-10 text-xl font-bold">עדיין לא הוספו משחקים או שהם נטענים... בקשו מההורים להוסיף דרך פאנל הניהול! 🛠️</div>`;
                 return;
             }
 
-            currentApps.forEach((app, index) => {
-                // מחזור צבעים לכרטיסיות
+            currentApps.forEach((appItem, index) => {
                 const colorClass = `color-${index % 6}`; 
                 
                 const card = document.createElement('a');
-                card.href = app.url;
+                card.href = appItem.url;
                 card.className = `tool-card ${colorClass} text-white rounded-3xl p-8 flex flex-col items-center justify-center text-center gap-4 cursor-pointer no-underline block`;
-                // אם אין קישור אמיתי, נמנע מעבר דף סתם
-                if(app.url === "#" || app.url === "") {
+                
+                if(appItem.url === "#" || appItem.url === "") {
                     card.onclick = (e) => {
                         e.preventDefault();
                         showToast("עדיין לא הוגדר קישור לאפליקציה זו. כנסו לאדמין לעדכן!");
@@ -248,8 +266,8 @@
                 }
 
                 card.innerHTML = `
-                    <span class="text-7xl drop-shadow-lg">${app.icon || '⭐'}</span>
-                    <h2 class="text-3xl font-extrabold drop-shadow-md">${app.name}</h2>
+                    <span class="text-7xl drop-shadow-lg">${appItem.icon || '⭐'}</span>
+                    <h2 class="text-3xl font-extrabold drop-shadow-md">${appItem.name}</h2>
                     <div class="mt-2 bg-white bg-opacity-20 px-6 py-2 rounded-full font-semibold text-lg flex items-center gap-2">
                         כניסה <span>▶</span>
                     </div>
@@ -258,7 +276,6 @@
             });
         }
 
-        // רינדור טבלת האדמין
         function renderAdminTable() {
             const list = document.getElementById('admin-apps-list');
             list.innerHTML = '';
@@ -268,20 +285,20 @@
                 return;
             }
 
-            currentApps.forEach(app => {
+            currentApps.forEach(appItem => {
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-100 hover:bg-gray-50";
                 
                 tr.innerHTML = `
-                    <td class="p-3 text-3xl text-center w-16">${app.icon}</td>
-                    <td class="p-3 font-bold text-gray-800">${app.name}</td>
+                    <td class="p-3 text-3xl text-center w-16">${appItem.icon}</td>
+                    <td class="p-3 font-bold text-gray-800">${appItem.name}</td>
                     <td class="p-3 text-left dir-ltr w-1/2">
                         <div class="truncate max-w-xs text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100">
-                            ${app.url}
+                            ${appItem.url}
                         </div>
                     </td>
                     <td class="p-3 text-center">
-                        <button onclick="deleteApp('${app.id}')" class="text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-bold py-1 px-3 rounded transition-colors text-sm">
+                        <button onclick="deleteApp('${appItem.id}')" class="text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-bold py-1 px-3 rounded transition-colors text-sm">
                             מחק 🗑️
                         </button>
                     </td>
@@ -290,9 +307,10 @@
             });
         }
 
-        // === פונקציות אדמין (הוספה / מחיקה) ===
+        // === פונקציות אדמין - כתיבה לענן ===
+        async function addNewApp() {
+            if (!currentUser) return;
 
-        function addNewApp() {
             const nameInput = document.getElementById('new-app-name');
             const iconInput = document.getElementById('new-app-icon');
             const urlInput = document.getElementById('new-app-url');
@@ -307,40 +325,44 @@
                 errorMsg.classList.remove('hidden');
                 return;
             }
-
             errorMsg.classList.add('hidden');
 
-            const newApp = {
-                id: generateId(),
-                name: name,
-                icon: icon,
-                url: url
-            };
+            const newId = generateId();
+            const newApp = { name, icon, url, createdAt: Date.now() };
 
-            currentApps.push(newApp);
-            saveAppsToStorage();
-            
-            // ניקוי הטופס
-            nameInput.value = '';
-            iconInput.value = '';
-            urlInput.value = '';
-
-            renderAdminTable();
-            showToast("האפליקציה נוספה בהצלחה!");
+            try {
+                // שמירה בענן!
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', newId);
+                await setDoc(docRef, newApp);
+                
+                // הניקוי יקרה מיד, הטבלה תתרענן אוטומטית בזכות ה-onSnapshot
+                nameInput.value = '';
+                iconInput.value = '';
+                urlInput.value = '';
+                showToast("האפליקציה נוספה בהצלחה לענן!");
+            } catch (error) {
+                console.error("שגיאה בהוספה:", error);
+                errorMsg.textContent = "שגיאה בשמירה לענן.";
+                errorMsg.classList.remove('hidden');
+            }
         }
 
-        function deleteApp(id) {
-            // יצירת חלונית אישור מותאמת (לא alert רגיל)
-            if(confirm("האם למחוק את האפליקציה מהפורטל?")) {
-                currentApps = currentApps.filter(app => app.id !== id);
-                saveAppsToStorage();
-                renderAdminTable();
-                showToast("האפליקציה נמחקה.");
+        async function deleteApp(id) {
+            if (!currentUser) return;
+
+            if(confirm("האם למחוק את האפליקציה מהפורטל בכל המכשירים?")) {
+                try {
+                    // מחיקה מהענן
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', id);
+                    await deleteDoc(docRef);
+                    showToast("האפליקציה נמחקה מהענן.");
+                } catch (error) {
+                    console.error("שגיאה במחיקה:", error);
+                }
             }
         }
 
         // === מערכת התחברות (מודאל) ===
-
         function openLoginModal() {
             const modal = document.getElementById('login-modal');
             const content = document.getElementById('login-modal-content');
@@ -350,7 +372,6 @@
             document.getElementById('login-error').classList.add('hidden');
             
             modal.classList.remove('hidden');
-            // Timeout קצר כדי לאפשר לאנימציית ה-CSS לעבוד
             setTimeout(() => {
                 modal.classList.remove('opacity-0');
                 content.classList.remove('scale-95');
@@ -396,7 +417,16 @@
             }, 3000);
         }
 
-        // הפעלת האפליקציה בטעינה
+        // מכיוון שאנחנו משתמשים ב- type="module", פונקציות הופכות למקומיות.
+        // אנחנו צריכים לחשוף אותן ל-window כדי שה-HTML (onclick) יוכל להפעיל אותן.
+        window.openLoginModal = openLoginModal;
+        window.closeLoginModal = closeLoginModal;
+        window.checkPin = checkPin;
+        window.showScreen = showScreen;
+        window.addNewApp = addNewApp;
+        window.deleteApp = deleteApp;
+
+        // הפעלת האפליקציה
         window.onload = init;
 
     </script>
