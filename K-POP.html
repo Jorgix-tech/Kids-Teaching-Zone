@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he" dir="rtl" class="bg-[#050510]">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,9 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        body {
+        html, body {
             font-family: 'Rubik', sans-serif;
-            background-color: #050510;
+            background-color: #050510 !important;
             color: white;
             overflow: hidden; 
             touch-action: none;
@@ -18,10 +18,10 @@
         }
 
         /* Backgrounds */
-        .bg-default { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); background-color: #050510; }
-        .bg-stage { background: radial-gradient(circle at 50% 0%, #4a00e0 0%, #050510 70%); background-size: cover; }
-        .bg-city { background-color: #000020; background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent); background-size: 50px 50px; }
-        .bg-forest { background-color: #051005; background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px); background-size: 550px 550px, 350px 350px, 250px 250px; background-position: 0 0, 40px 60px, 130px 270px; }
+        .bg-default { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); background-color: #050510 !important; }
+        .bg-stage { background: radial-gradient(circle at 50% 0%, #4a00e0 0%, #050510 70%) !important; background-color: #050510 !important; background-size: cover !important; }
+        .bg-city { background-color: #000020 !important; background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent) !important; background-size: 50px 50px !important; }
+        .bg-forest { background-color: #051005 !important; background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px) !important; background-size: 550px 550px, 350px 350px, 250px 250px !important; background-position: 0 0, 40px 60px, 130px 270px !important; }
 
         .hidden-screen { display: none !important; }
         .force-ltr { direction: ltr !important; unicode-bidi: bidi-override; }
@@ -575,7 +575,8 @@
         }
 
         function applyBackground() {
-            document.getElementById('main-body').className = `h-[100dvh] w-full flex items-center justify-center ${state.equippedBg}`;
+            const bgClass = state.equippedBg || 'bg-default';
+            document.getElementById('main-body').className = `h-[100dvh] w-full flex items-center justify-center ${bgClass}`;
         }
 
         // --- AUDIO & VOICE SYSTEM ---
