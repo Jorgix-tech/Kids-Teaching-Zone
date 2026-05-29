@@ -15,37 +15,22 @@
             background-size: 30px 30px;
         }
 
-        .tool-card {
+        .tool-card, .folder-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .tool-card:hover {
+        .tool-card:hover, .folder-card:hover {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
 
-        /* צבעים מתחלפים לכרטיסיות */
+        /* צבעים מתחלפים לכרטיסיות כלים */
         .color-0 { background: linear-gradient(135deg, #3b82f6, #2563eb); }
         .color-1 { background: linear-gradient(135deg, #10b981, #059669); }
         .color-2 { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .color-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         .color-4 { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .color-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
-
-        .category-title {
-            position: relative;
-            display: inline-block;
-        }
-        .category-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            right: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, #3b82f6, transparent);
-            border-radius: 2px;
-        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -54,7 +39,7 @@
     <div id="portal-screen" class="flex-1 flex flex-col items-center p-6 w-full max-w-5xl mx-auto">
         
         <!-- כפתור אדמין מוסתר בפינה -->
-        <div class="w-full flex justify-end mb-4">
+        <div class="w-full flex justify-end mb-2">
             <button onclick="openLoginModal()" class="text-gray-400 hover:text-gray-700 transition-colors p-2 rounded-full hover:bg-gray-200" title="פאנל ניהול (להורים)">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -63,13 +48,13 @@
             </button>
         </div>
 
-        <header class="text-center mb-10">
+        <header class="text-center mb-6">
             <h1 class="text-5xl md:text-6xl font-extrabold text-blue-600 drop-shadow-md mb-2">מרכז הלימודים של אלמה ובן דרעי 🚀</h1>
             <p class="text-xl text-gray-600 font-semibold">איזה נושא נרצה לתרגל היום?</p>
         </header>
 
-        <!-- אזור התוכן - יכיל את התיקיות -->
-        <div id="portal-content" class="w-full flex flex-col gap-10 pb-10">
+        <!-- אזור התוכן - יכיל סרגל ניווט, תיקיות וכלים -->
+        <div id="portal-content" class="w-full flex flex-col gap-6 pb-10">
             <!-- התוכן יוזרק לכאן דרך JS -->
         </div>
 
@@ -102,8 +87,8 @@
                         <input type="text" id="new-app-icon" placeholder="למשל: 🧮" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1">תיקייה (קטגוריה)</label>
-                        <input type="text" id="new-app-category" list="categories-list" placeholder="למשל: אנגלית" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <label class="block text-sm font-semibold text-gray-600 mb-1" title="השתמשו בלוכסן לתתי-תיקיות">תיקייה (למשל: כיתה ג' / חשבון)</label>
+                        <input type="text" id="new-app-category" list="categories-list" placeholder="למשל: כללי" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         <datalist id="categories-list"></datalist>
                     </div>
                     <div>
@@ -136,7 +121,7 @@
                             <tr class="bg-gray-100 text-gray-600 border-b-2 border-gray-200">
                                 <th class="p-4 text-center">סמל</th>
                                 <th class="p-4">שם האפליקציה</th>
-                                <th class="p-4">תיקייה</th>
+                                <th class="p-4">נתיב תיקייה</th>
                                 <th class="p-4 hidden md:table-cell">קישור</th>
                                 <th class="p-4 text-center">פעולות</th>
                             </tr>
@@ -213,7 +198,10 @@
         // === נתונים והגדרות ===
         const ADMIN_PIN = "1122"; 
         let currentApps = [];
-        let editingAppId = null; // משתנה למעקב אם אנחנו בעריכה של כלי קיים
+        let editingAppId = null; 
+        
+        // נתיב הניווט הנוכחי במערכת התיקיות
+        let currentPath = [];
 
         // === אתחול האפליקציה ===
         async function init() {
@@ -271,18 +259,35 @@
             return Math.random().toString(36).substr(2, 9);
         }
 
-        // מחלץ את כל התיקיות הייחודיות להשלמה אוטומטית בטופס
+        // מחלץ את כל התיקיות הייחודיות להשלמה אוטומטית
         function updateCategoriesDatalist() {
             const datalist = document.getElementById('categories-list');
             datalist.innerHTML = '';
             
-            const categories = new Set(currentApps.map(app => app.category || 'כללי'));
+            // נשלוף את כל המחרוזות הייחודיות של הקטגוריות
+            const categories = new Set(currentApps.map(app => app.category).filter(c => c));
             
             categories.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category;
                 datalist.appendChild(option);
             });
+        }
+
+        // פונקציות ניווט תיקיות
+        function openFolder(folderName) {
+            currentPath.push(folderName);
+            renderPortal();
+        }
+
+        function goToPath(index) {
+            currentPath = currentPath.slice(0, index + 1);
+            renderPortal();
+        }
+
+        function goToRoot() {
+            currentPath = [];
+            renderPortal();
         }
 
         // === ניהול תצוגה (UI) ===
@@ -308,43 +313,115 @@
                 return;
             }
 
-            // קיבוץ אפליקציות לפי תיקייה (קטגוריה)
-            const groupedApps = {};
-            currentApps.forEach(app => {
-                // אם לכלי אין קטגוריה, הוא ישויך ל"כללי"
-                const category = app.category || 'כללי';
-                if (!groupedApps[category]) {
-                    groupedApps[category] = [];
+            // יצירת סרגל ניווט (Breadcrumbs)
+            const nav = document.createElement('nav');
+            nav.className = 'flex flex-wrap items-center gap-2 mb-4 w-full text-xl font-bold text-gray-600 bg-white/60 p-4 rounded-xl shadow-sm border border-blue-50';
+            
+            let navHtml = `<button onclick="goToRoot()" class="hover:text-blue-600 transition-colors flex items-center gap-2">🏠 ראשי</button>`;
+            
+            currentPath.forEach((folder, index) => {
+                navHtml += `<span class="text-gray-400 text-sm">◀</span>`;
+                if (index === currentPath.length - 1) {
+                    navHtml += `<span class="text-blue-600 cursor-default">${folder}</span>`;
+                } else {
+                    navHtml += `<button onclick="goToPath(${index})" class="hover:text-blue-600 transition-colors">${folder}</button>`;
                 }
-                groupedApps[category].push(app);
+            });
+            nav.innerHTML = navHtml;
+            container.appendChild(nav);
+
+            // איסוף תוכן לתיקייה הנוכחית
+            const foldersInCurrentPath = {}; // מילון של תיקיות בתוך התיקייה הנוכחית (שם תיקייה -> מערך אפליקציות)
+            const directAppsInCurrentPath = []; // אפליקציות שנמצאות ממש בתיקייה הזו
+
+            currentApps.forEach(app => {
+                const catStr = app.category || '';
+                // מפרק את מחרוזת התיקיות ("א / ב / ג" יהפוך ל ["א", "ב", "ג"])
+                const parts = catStr.split('/').map(p => p.trim()).filter(p => p);
+                
+                // בדיקה האם האפליקציה נמצאת תחת הנתיב הנוכחי שלנו
+                let matchesPath = true;
+                for(let i=0; i<currentPath.length; i++) {
+                    if(parts[i] !== currentPath[i]) {
+                        matchesPath = false;
+                        break;
+                    }
+                }
+
+                if(matchesPath) {
+                    if(parts.length === currentPath.length) {
+                        // האפליקציה נמצאת ישירות בתוך התיקייה הנוכחית
+                        directAppsInCurrentPath.push(app);
+                    } else {
+                        // האפליקציה נמצאת בתת-תיקייה
+                        const nextFolderName = parts[currentPath.length];
+                        if(!foldersInCurrentPath[nextFolderName]) {
+                            foldersInCurrentPath[nextFolderName] = [];
+                        }
+                        foldersInCurrentPath[nextFolderName].push(app);
+                    }
+                }
             });
 
-            // רינדור כל קבוצה (תיקייה)
-            let colorIndexCounter = 0;
-            
-            for (const [category, apps] of Object.entries(groupedApps)) {
-                // יצירת אזור לתיקייה
-                const section = document.createElement('div');
-                section.className = 'w-full';
+            // רינדור התיקיות (תצוגה מקדימה)
+            const folderNames = Object.keys(foldersInCurrentPath);
+            if (folderNames.length > 0) {
+                const folderGrid = document.createElement('div');
+                folderGrid.className = 'grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 w-full mb-8';
                 
-                // כותרת התיקייה
-                const titleHtml = `
-                    <div class="mb-6">
-                        <h2 class="text-3xl font-extrabold text-gray-800 category-title">📁 ${category}</h2>
-                    </div>
-                `;
+                folderNames.forEach(folderName => {
+                    const appsInFolder = foldersInCurrentPath[folderName];
+                    const count = appsInFolder.length;
+                    
+                    // איסוף עד 4 אימוג'ים לתצוגה המקדימה
+                    const previews = appsInFolder.slice(0, 4).map(a => a.icon || '⭐');
+                    let previewHtml = '';
+                    previews.forEach(icon => {
+                        previewHtml += `<div class="w-8 h-8 bg-white/80 rounded-full flex items-center justify-center text-sm shadow-sm">${icon}</div>`;
+                    });
+                    if (count > 4) {
+                        previewHtml += `<div class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-xs font-bold shadow-sm text-gray-600">+${count-4}</div>`;
+                    }
+
+                    const folderCard = document.createElement('div');
+                    folderCard.onclick = () => openFolder(folderName);
+                    folderCard.className = `folder-card bg-gradient-to-br from-yellow-100 to-yellow-200 border-2 border-yellow-300 rounded-3xl p-6 cursor-pointer flex flex-col items-center gap-2 shadow-sm relative overflow-hidden`;
+                    
+                    // עיצוב יפה לתיקייה
+                    folderCard.innerHTML = `
+                        <div class="absolute top-0 right-0 w-1/2 h-4 bg-yellow-300 rounded-bl-xl opacity-50"></div>
+                        <span class="text-6xl mt-2 mb-1 drop-shadow-md">📁</span>
+                        <h3 class="text-2xl font-extrabold text-yellow-900 text-center leading-tight z-10">${folderName}</h3>
+                        <div class="flex flex-wrap justify-center gap-1.5 mt-2 z-10">
+                            ${previewHtml}
+                        </div>
+                        <div class="text-xs bg-yellow-300 text-yellow-900 font-bold px-3 py-1 rounded-full mt-2 z-10 shadow-sm">${count} פריטים</div>
+                    `;
+                    folderGrid.appendChild(folderCard);
+                });
+                container.appendChild(folderGrid);
+            }
+
+            // רינדור האפליקציות הישירות (כלים) בתוך התיקייה הנוכחית
+            if (directAppsInCurrentPath.length > 0) {
+                // כותרת מפרידה אם יש גם תיקיות וגם כלים מעורבבים
+                if (folderNames.length > 0) {
+                    const sep = document.createElement('div');
+                    sep.innerHTML = `<h3 class="text-2xl font-bold text-gray-700 mb-4 category-title">🛠️ כלים בתיקייה זו</h3>`;
+                    container.appendChild(sep);
+                }
+
+                const appsGrid = document.createElement('div');
+                appsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full';
                 
-                // יצירת הגריד של האפליקציות באותה תיקייה
-                const grid = document.createElement('div');
-                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full';
-                
-                apps.forEach((appItem) => {
+                let colorIndexCounter = 0;
+                directAppsInCurrentPath.forEach((appItem) => {
                     const colorClass = `color-${colorIndexCounter % 6}`; 
                     colorIndexCounter++;
                     
                     const card = document.createElement('a');
                     card.href = appItem.url;
-                    card.className = `tool-card ${colorClass} text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer no-underline block`;
+                    card.className = `tool-card ${colorClass} text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer no-underline block h-full`;
                     
                     if(appItem.url === "#" || appItem.url === "") {
                         card.onclick = (e) => {
@@ -354,18 +431,20 @@
                     }
 
                     card.innerHTML = `
-                        <span class="text-6xl drop-shadow-lg">${appItem.icon || '⭐'}</span>
-                        <h3 class="text-2xl font-extrabold drop-shadow-md leading-tight">${appItem.name}</h3>
-                        <div class="mt-auto bg-white bg-opacity-20 px-5 py-2 rounded-full font-semibold text-sm flex items-center gap-2">
+                        <span class="text-7xl drop-shadow-lg mb-2">${appItem.icon || '⭐'}</span>
+                        <h3 class="text-3xl font-extrabold drop-shadow-md leading-tight">${appItem.name}</h3>
+                        <div class="mt-auto bg-white bg-opacity-25 hover:bg-opacity-40 transition-colors px-6 py-2 rounded-full font-bold text-lg flex items-center gap-2 shadow-sm">
                             כניסה <span>▶</span>
                         </div>
                     `;
-                    grid.appendChild(card);
+                    appsGrid.appendChild(card);
                 });
+                container.appendChild(appsGrid);
+            }
 
-                section.innerHTML = titleHtml;
-                section.appendChild(grid);
-                container.appendChild(section);
+            // אם התיקייה הנוכחית ריקה לגמרי (לא אמור לקרות אלא אם מחקו הכל בזמן שהיינו בפנים)
+            if (folderNames.length === 0 && directAppsInCurrentPath.length === 0 && currentPath.length > 0) {
+                 container.innerHTML += `<div class="text-center text-gray-500 mt-10 text-xl font-bold w-full">התיקייה הזו ריקה 📭</div>`;
             }
         }
 
@@ -382,20 +461,21 @@
                 const tr = document.createElement('tr');
                 tr.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors";
                 
+                // תצוגת נתיב יפה בטבלה
                 const categoryBadge = appItem.category ? 
-                    `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-md border border-purple-200">${appItem.category}</span>` : 
-                    `<span class="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-1 rounded-md">כללי</span>`;
+                    `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-md border border-purple-200 break-words">${appItem.category.replace(/\//g, ' ◀ ')}</span>` : 
+                    `<span class="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-1 rounded-md">ראשי</span>`;
 
                 tr.innerHTML = `
                     <td class="p-4 text-3xl text-center w-16">${appItem.icon || '⭐'}</td>
                     <td class="p-4 font-bold text-gray-800 text-lg">${appItem.name}</td>
-                    <td class="p-4">${categoryBadge}</td>
+                    <td class="p-4 max-w-xs">${categoryBadge}</td>
                     <td class="p-4 text-left dir-ltr hidden md:table-cell max-w-xs">
                         <div class="truncate text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100" dir="ltr" title="${appItem.url}">
                             ${appItem.url}
                         </div>
                     </td>
-                    <td class="p-4 text-center flex justify-center gap-2">
+                    <td class="p-4 text-center flex justify-center gap-2 flex-wrap">
                         <button onclick="startEdit('${appItem.id}')" class="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 font-bold py-1 px-3 rounded transition-colors text-sm" title="ערוך אפליקציה">
                             ערוך ✏️
                         </button>
@@ -414,15 +494,13 @@
             const appToEdit = currentApps.find(a => a.id === id);
             if (!appToEdit) return;
 
-            editingAppId = id; // שומרים את המזהה
+            editingAppId = id; 
             
-            // מילוי הטופס בנתונים הקיימים
             document.getElementById('new-app-name').value = appToEdit.name || '';
             document.getElementById('new-app-icon').value = appToEdit.icon || '';
             document.getElementById('new-app-url').value = appToEdit.url || '';
-            document.getElementById('new-app-category').value = appToEdit.category || 'כללי';
+            document.getElementById('new-app-category').value = appToEdit.category || '';
             
-            // שינוי נראות הטופס
             document.getElementById('form-title').innerHTML = `<span>✏️</span> עריכת כלי: <span class="text-blue-600">${appToEdit.name}</span>`;
             
             const saveBtn = document.getElementById('save-app-btn');
@@ -437,9 +515,7 @@
             
             document.getElementById('cancel-edit-btn').classList.remove('hidden');
             
-            // גלילה חלקה למעלה לטופס
             document.getElementById('admin-form-container').scrollIntoView({ behavior: 'smooth' });
-            // הבלטה זמנית של הטופס
             document.getElementById('admin-form-container').classList.add('ring-4', 'ring-blue-200');
             setTimeout(() => document.getElementById('admin-form-container').classList.remove('ring-4', 'ring-blue-200'), 1000);
         }
@@ -447,13 +523,11 @@
         function cancelEdit() {
             editingAppId = null;
             
-            // איפוס הטופס
             document.getElementById('new-app-name').value = '';
             document.getElementById('new-app-icon').value = '';
             document.getElementById('new-app-url').value = '';
             document.getElementById('new-app-category').value = '';
             
-            // חזרה למצב הוספה
             document.getElementById('form-title').innerHTML = `<span>➕</span> הוספת משחק / כלי חדש`;
             
             const saveBtn = document.getElementById('save-app-btn');
@@ -485,7 +559,7 @@
             const name = nameInput.value.trim();
             const icon = iconInput.value.trim() || '⭐';
             const url = urlInput.value.trim();
-            const category = catInput.value.trim() || 'כללי'; // ברירת מחדל אם ריק
+            const category = catInput.value.trim(); // נשמר ריק אם לא הוזן, וזה אומר "ראשי"
 
             if (!name || !url) {
                 errorMsg.textContent = "חובה להזין שם וקישור URL.";
@@ -496,12 +570,10 @@
 
             try {
                 if (editingAppId) {
-                    // מצב עדכון של כלי קיים
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', editingAppId);
                     await updateDoc(docRef, { name, icon, url, category });
-                    showToast("הכלי עודכן ושובץ בתיקייה בהצלחה! ✅");
+                    showToast("הכלי עודכן בתיקייה בהצלחה! ✅");
                 } else {
-                    // מצב הוספת כלי חדש
                     const newId = generateId();
                     const newApp = { name, icon, url, category, createdAt: Date.now() };
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', newId);
@@ -509,7 +581,6 @@
                     showToast("האפליקציה נוספה בהצלחה! ✨");
                 }
                 
-                // חזרה למצב הוספה רגיל וניקוי הטופס
                 cancelEdit();
                 
             } catch (error) {
@@ -529,7 +600,7 @@
                     showToast("האפליקציה נמחקה מהפורטל. 🗑️");
                     
                     if (editingAppId === id) {
-                        cancelEdit(); // אם היינו באמצע עריכה של מה שנמחק
+                        cancelEdit(); 
                     }
                 } catch (error) {
                     console.error("שגיאה במחיקה:", error);
@@ -601,6 +672,9 @@
         window.startEdit = startEdit;
         window.cancelEdit = cancelEdit;
         window.deleteApp = deleteApp;
+        window.goToRoot = goToRoot;
+        window.goToPath = goToPath;
+        window.openFolder = openFolder;
 
         window.onload = init;
 
