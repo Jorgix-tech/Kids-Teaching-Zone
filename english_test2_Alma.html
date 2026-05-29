@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>לומדים אנגלית - יחידה 2 - כיתה ג'3 רקפות ראשון לציון</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Varela Round', sans-serif;
+            background-color: #f0f9ff;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23bae6fd' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        /* Card Flip Animation */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .card-inner {
+            transition: transform 0.6s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .correct-answer { animation: pulse-green 0.5s ease-in-out; background-color: #86efac !important; border-color: #22c55e !important; }
+        .wrong-answer { animation: shake 0.5s ease-in-out; background-color: #fca5a5 !important; border-color: #ef4444 !important; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .btn-primary {
+            @apply bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-2xl shadow-lg transform transition hover:-translate-y-1 text-lg w-full md:w-auto text-center cursor-pointer;
+        }
+
+        .btn-secondary {
+            @apply bg-white hover:bg-gray-50 text-blue-500 font-bold py-2 px-4 rounded-xl border-2 border-blue-200 shadow-sm transition cursor-pointer;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl flex justify-between items-center mb-8 bg-white p-4 rounded-3xl shadow-md border-b-4 border-blue-200">
+        <h1 class="text-xl md:text-2xl lg:text-3xl font-bold text-blue-600 text-center flex-1">🎓 יחידה 2 - כיתה ג'3 רקפות ראשון לציון</h1>
+        <button onclick="showMainMenu()" class="text-gray-500 hover:text-blue-500 mr-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+            </svg>
+        </button>
+    </header>
+
+    <!-- Main Menu -->
+    <div id="main-menu" class="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+        <div onclick="startStudyMode()" class="bg-white p-6 rounded-3xl shadow-lg border-b-4 border-purple-200 cursor-pointer hover:bg-purple-50 transition transform hover:scale-105">
+            <div class="text-4xl mb-4">📖</div>
+            <h2 class="text-xl font-bold text-purple-600">חזרה על המילים</h2>
+            <p class="text-gray-500">רואים את המילים ולומדים לפני שמשחקים</p>
+        </div>
+
+        <div onclick="startQuizMode()" class="bg-white p-6 rounded-3xl shadow-lg border-b-4 border-green-200 cursor-pointer hover:bg-green-50 transition transform hover:scale-105">
+            <div class="text-4xl mb-4">❓</div>
+            <h2 class="text-xl font-bold text-green-600">מבחן אמריקאי</h2>
+            <p class="text-gray-500">בוחרים את התשובה הנכונה מתוך 4 אפשרויות</p>
+        </div>
+
+        <div onclick="startMemoryGame()" class="bg-white p-6 rounded-3xl shadow-lg border-b-4 border-orange-200 cursor-pointer hover:bg-orange-50 transition transform hover:scale-105">
+            <div class="text-4xl mb-4">🧩</div>
+            <h2 class="text-xl font-bold text-orange-600">משחק הזיכרון</h2>
+            <p class="text-gray-500">מוצאים זוגות של עברית ואנגלית</p>
+        </div>
+
+        <div onclick="startSpellingMode()" class="bg-white p-6 rounded-3xl shadow-lg border-b-4 border-pink-200 cursor-pointer hover:bg-pink-50 transition transform hover:scale-105">
+            <div class="text-4xl mb-4">✍️</div>
+            <h2 class="text-xl font-bold text-pink-600">סידור אותיות</h2>
+            <p class="text-gray-500">מרכיבים את המילה באנגלית מהאותיות</p>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" class="w-full max-w-4xl hidden">
+        <!-- Dynamic content will be injected here -->
+    </div>
+
+    <!-- Victory Modal -->
+    <div id="victory-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl transform scale-100 transition-transform">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-yellow-500 mb-2">כל הכבוד!</h2>
+            <p class="text-gray-600 mb-6 text-lg">סיימת את כל המשימות בהצלחה!</p>
+            <button onclick="showMainMenu()" class="btn-primary">חזרה לתפריט הראשי</button>
+        </div>
+    </div>
+
+    <script>
+        // Data from the uploaded file with emojis
+        const vocabulary = [
+            { he: "כף יד", en: "hand", icon: "✋" },
+            { he: "לשחק", en: "play", icon: "🎮" },
+            { he: "בתוך", en: "in", icon: "📥" },
+            { he: "מבחן", en: "test", icon: "📝" },
+            { he: "פיל", en: "elephant", icon: "🐘" },
+            { he: "סוס", en: "horse", icon: "🐎" },
+            { he: "לשיר", en: "sing", icon: "🎤" },
+            { he: "על", en: "on", icon: "🔛" },
+            { he: "מורה", en: "teacher", icon: "👩‍🏫" },
+            { he: "ביצה", en: "egg", icon: "🥚" },
+            { he: "שמח", en: "happy", icon: "😊" },
+            { he: "לרוץ", en: "run", icon: "🏃" },
+            { he: "תלמיד", en: "pupil", icon: "🎒" },
+            { he: "עט", en: "pen", icon: "🖊️" },
+            { he: "מחק", en: "eraser", icon: "🧽" },
+            { he: "טוב", en: "good", icon: "👍" },
+            { he: "לנוח", en: "rest", icon: "😴" },
+            { he: "תמונה", en: "picture", icon: "🖼️" },
+            { he: "קלמר", en: "pencil case", icon: "👝" },
+            { he: "בית ספר", en: "school", icon: "🏫" },
+            { he: "גבוה", en: "tall", icon: "🦒" },
+            { he: "תרנגולת", en: "hen", icon: "🐔" },
+            { he: "כסא", en: "chair", icon: "🪑" },
+            { he: "כובע", en: "hat", icon: "👒" },
+            { he: "עפרון", en: "pencil", icon: "✏️" },
+            { he: "מהיר", en: "fast", icon: "🏎️" },
+            { he: "ארנבת", en: "rabbit", icon: "🐇" },
+            { he: "לאבד", en: "lost", icon: "🤷" },
+            { he: "להוסיף", en: "add", icon: "➕" },
+            { he: "מיטה", en: "bed", icon: "🛏️" },
+            { he: "כדור", en: "ball", icon: "⚽" },
+            { he: "הכי טוב", en: "best", icon: "🏆" },
+            { he: "לשאול", en: "ask", icon: "❓" },
+            { he: "פלוס", en: "plus", icon: "➕" },
+            { he: "שולחן", en: "table", icon: "🍽️" }
+        ];
+
+        // State variables
+        let currentMode = '';
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let shuffledVocab = [];
+        let spellingHistory = []; 
+        
+        // --- Navigation ---
+
+        function showMainMenu() {
+            document.getElementById('main-menu').classList.remove('hidden');
+            document.getElementById('game-container').classList.add('hidden');
+            document.getElementById('victory-modal').classList.add('hidden');
+            currentMode = '';
+        }
+
+        function showGameContainer() {
+            document.getElementById('main-menu').classList.add('hidden');
+            document.getElementById('game-container').classList.remove('hidden');
+        }
+
+        function showVictory() {
+            document.getElementById('victory-modal').classList.remove('hidden');
+            launchConfetti();
+        }
+
+        // --- Helper Functions ---
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // עצירת דיבור קודם אם יש
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // אנגלית אמריקאית
+                utterance.rate = 0.8; // קצת יותר איטי שיהיה ברור לילדים
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // --- Study Mode ---
+
+        function startStudyMode() {
+            showGameContainer();
+            const container = document.getElementById('game-container');
+            let html = `
+                <div class="bg-white rounded-3xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-center text-purple-600 mb-6">רשימת המילים ללמידה</h2>
+                    <p class="text-center text-gray-500 mb-4 text-sm">לחצו על הרמקול 🔊 כדי לשמוע את המילה</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            `;
+            
+            vocabulary.forEach(word => {
+                html += `
+                    <div class="flex justify-between items-center p-3 bg-purple-50 rounded-xl border border-purple-100 hover:bg-purple-100 transition">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${word.icon}</span>
+                            <span class="font-bold text-gray-700 text-lg">${word.he}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-purple-600 font-sans text-xl">${word.en}</span>
+                            <button onclick="speak('${word.en}')" class="bg-white hover:bg-purple-200 text-purple-600 rounded-full p-2 shadow-sm transition active:scale-95 border border-purple-100" title="השמע מילה">
+                                🔊
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `
+                    </div>
+                    <div class="mt-8 text-center">
+                        <button onclick="showMainMenu()" class="btn-primary">חזרה לתפריט</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        // --- Quiz Mode ---
+
+        function startQuizMode() {
+            showGameContainer();
+            shuffledVocab = shuffleArray([...vocabulary]);
+            currentQuestionIndex = 0;
+            score = 0;
+            renderQuizQuestion();
+        }
+
+        function renderQuizQuestion() {
+            if (currentQuestionIndex >= shuffledVocab.length) {
+                showVictory();
+                return;
+            }
+
+            const currentWord = shuffledVocab[currentQuestionIndex];
+            const container = document.getElementById('game-container');
+            
+            // Generate distractors
+            let options = [currentWord.en];
+            while (options.length < 4) {
+                const randomWord = vocabulary[Math.floor(Math.random() * vocabulary.length)].en;
+                if (!options.includes(randomWord)) options.push(randomWord);
+            }
+            options = shuffleArray(options);
+
+            const progress = ((currentQuestionIndex) / shuffledVocab.length) * 100;
+
+            let html = `
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                    <div class="bg-green-500 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                </div>
+                <div class="bg-white rounded-3xl shadow-lg p-8 max-w-2xl mx-auto text-center">
+                    <div class="mb-2 text-gray-400">שאלה ${currentQuestionIndex + 1} מתוך ${shuffledVocab.length}</div>
+                    <div class="text-6xl mb-4">${currentWord.icon}</div>
+                    <h2 class="text-4xl font-bold text-gray-800 mb-8">${currentWord.he}</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            `;
+
+            options.forEach(opt => {
+                html += `<button onclick="checkQuizAnswer(this, '${opt}', '${currentWord.en}')" class="btn-secondary text-xl py-4 hover:shadow-md">${opt}</button>`;
+            });
+
+            html += `
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        function checkQuizAnswer(btn, selected, correct) {
+            const buttons = document.querySelectorAll('#game-container button');
+            buttons.forEach(b => b.disabled = true);
+
+            if (selected === correct) {
+                btn.classList.add('correct-answer');
+                setTimeout(() => {
+                    currentQuestionIndex++;
+                    renderQuizQuestion();
+                }, 1000);
+            } else {
+                btn.classList.add('wrong-answer');
+                // Highlight correct one
+                buttons.forEach(b => {
+                    if (b.innerText === correct) b.classList.add('correct-answer');
+                });
+                setTimeout(() => {
+                    // Move correct word to end of queue to try again later
+                    shuffledVocab.push(shuffledVocab[currentQuestionIndex]);
+                    currentQuestionIndex++;
+                    renderQuizQuestion();
+                }, 2000);
+            }
+        }
+
+        // --- Memory Game ---
+
+        let flippedCards = [];
+        let matchedPairs = 0;
+
+        function startMemoryGame() {
+            showGameContainer();
+            // Select 8 random pairs
+            const gameSubset = shuffleArray([...vocabulary]).slice(0, 8);
+            let cards = [];
+            gameSubset.forEach(item => {
+                cards.push({ id: item.en, text: item.he, type: 'he', icon: item.icon });
+                cards.push({ id: item.en, text: item.en, type: 'en', icon: item.icon });
+            });
+            cards = shuffleArray(cards);
+            
+            flippedCards = [];
+            matchedPairs = 0;
+
+            const container = document.getElementById('game-container');
+            let html = `
+                <div class="bg-white rounded-3xl shadow-lg p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-bold text-orange-600">מצאו את הזוגות</h2>
+                        <button onclick="startMemoryGame()" class="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-lg">ערבב מחדש</button>
+                    </div>
+                    <div class="grid grid-cols-4 gap-3 md:gap-4">
+            `;
+
+            cards.forEach((card, index) => {
+                html += `
+                    <div class="card perspective-1000 h-24 md:h-32 cursor-pointer" onclick="flipCard(this, '${card.id}', ${index})">
+                        <div class="card-inner w-full h-full relative transform-style-3d duration-500 rounded-xl">
+                            <div class="absolute w-full h-full bg-orange-400 rounded-xl backface-hidden flex items-center justify-center text-white text-3xl shadow-md border-b-4 border-orange-600">
+                                ❓
+                            </div>
+                            <div class="absolute w-full h-full bg-white rounded-xl backface-hidden rotate-y-180 flex flex-col items-center justify-center border-2 border-orange-300 shadow-md text-center p-1">
+                                <div class="text-2xl mb-1">${card.icon}</div>
+                                <span class="${card.type === 'en' ? 'font-sans text-lg md:text-xl font-bold text-blue-600' : 'font-bold text-gray-700 md:text-lg'} select-none leading-tight">${card.text}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div></div>`;
+            container.innerHTML = html;
+        }
+
+        function flipCard(cardElement, id, index) {
+            if (flippedCards.length >= 2 || cardElement.classList.contains('flipped') || cardElement.classList.contains('matched')) return;
+
+            cardElement.classList.add('flipped');
+            flippedCards.push({ element: cardElement, id: id });
+
+            if (flippedCards.length === 2) {
+                checkMatch();
+            }
+        }
+
+        function checkMatch() {
+            const [card1, card2] = flippedCards;
+
+            if (card1.id === card2.id) {
+                // Match
+                card1.element.classList.add('matched');
+                card2.element.classList.add('matched');
+                // Visual success cue on cards
+                card1.element.querySelector('.rotate-y-180').classList.add('bg-green-100', 'border-green-300');
+                card2.element.querySelector('.rotate-y-180').classList.add('bg-green-100', 'border-green-300');
+                
+                flippedCards = [];
+                matchedPairs++;
+                if (matchedPairs === 8) {
+                    setTimeout(showVictory, 500);
+                }
+            } else {
+                // No match
+                setTimeout(() => {
+                    card1.element.classList.remove('flipped');
+                    card2.element.classList.remove('flipped');
+                    flippedCards = [];
+                }, 1000);
+            }
+        }
+
+        // --- Spelling Mode ---
+
+        function startSpellingMode() {
+            showGameContainer();
+            shuffledVocab = shuffleArray([...vocabulary]);
+            currentQuestionIndex = 0;
+            renderSpellingQuestion();
+        }
+
+        function renderSpellingQuestion() {
+            spellingHistory = [];
+            
+            if (currentQuestionIndex >= shuffledVocab.length) {
+                showVictory();
+                return;
+            }
+
+            const currentWord = shuffledVocab[currentQuestionIndex];
+            const cleanWord = currentWord.en.replace(/\s/g, ''); 
+            const letters = currentWord.en.split('').filter(c => c !== ' ');
+            const shuffledLetters = shuffleArray([...letters]);
+
+            const container = document.getElementById('game-container');
+            const progress = ((currentQuestionIndex) / shuffledVocab.length) * 100;
+
+            let html = `
+                <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                    <div class="bg-pink-500 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                </div>
+                <div class="bg-white rounded-3xl shadow-lg p-8 max-w-2xl mx-auto text-center">
+                    <div class="text-6xl mb-4">${currentWord.icon}</div>
+                    <h2 class="text-3xl font-bold text-gray-800 mb-4">${currentWord.he}</h2>
+                    
+                    <!-- Answer Display Area -->
+                    <div id="answer-area" class="flex flex-wrap justify-center gap-2 mb-8 min-h-[60px]" dir="ltr">
+                        ${currentWord.en.split('').map(char => {
+                            if(char === ' ') return '<div class="w-4"></div>';
+                            return `<div class="w-10 h-12 md:w-12 md:h-14 border-b-4 border-gray-300 flex items-center justify-center text-2xl font-sans font-bold text-blue-600 empty-slot"></div>`;
+                        }).join('')}
+                    </div>
+
+                    <!-- Letter Bank -->
+                    <div id="letter-bank" class="flex flex-wrap justify-center gap-3 mb-6" dir="ltr">
+            `;
+
+            shuffledLetters.forEach((char, idx) => {
+                html += `<button onclick="useLetter(this, '${char}')" class="letter-btn w-12 h-12 bg-pink-100 hover:bg-pink-200 text-pink-600 rounded-xl font-bold text-xl shadow-sm border-b-4 border-pink-300 transition transform active:scale-95 font-sans">${char}</button>`;
+            });
+
+            html += `
+                    </div>
+                    
+                    <div class="flex justify-center gap-4 mt-6">
+                        <button onclick="undoSpelling()" class="flex items-center gap-2 bg-yellow-100 text-yellow-700 px-6 py-3 rounded-2xl font-bold hover:bg-yellow-200 transition shadow-sm transform active:scale-95">
+                            <span class="text-xl">🔙</span> תיקון טעות
+                        </button>
+                        <button onclick="resetSpelling()" class="flex items-center gap-2 bg-red-100 text-red-700 px-6 py-3 rounded-2xl font-bold hover:bg-red-200 transition shadow-sm transform active:scale-95">
+                            <span class="text-xl">🔄</span> נקה הכל
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+        }
+
+        let currentSpellingInput = [];
+
+        function useLetter(btn, char) {
+            const slots = document.querySelectorAll('.empty-slot');
+            let nextSlot = null;
+            
+            // Find first empty slot
+            for(let slot of slots) {
+                if(slot.innerText === '') {
+                    nextSlot = slot;
+                    break;
+                }
+            }
+
+            if (nextSlot) {
+                nextSlot.innerText = char;
+                nextSlot.classList.remove('border-gray-300');
+                nextSlot.classList.add('border-blue-500', 'bg-blue-50');
+                btn.classList.add('opacity-0', 'pointer-events-none'); 
+                
+                spellingHistory.push({
+                    slot: nextSlot,
+                    btn: btn
+                });
+                
+                checkSpellingCompletion();
+            }
+        }
+
+        function undoSpelling() {
+            if (spellingHistory.length === 0) return;
+
+            const lastAction = spellingHistory.pop();
+            const { slot, btn } = lastAction;
+
+            slot.innerText = '';
+            slot.classList.remove('border-blue-500', 'bg-blue-50');
+            slot.classList.add('border-gray-300');
+
+            btn.classList.remove('opacity-0', 'pointer-events-none');
+
+            const slots = document.querySelectorAll('.empty-slot');
+            slots.forEach(s => s.classList.remove('bg-red-100', 'border-red-500', 'text-red-700', 'animate-pulse'));
+        }
+
+        function resetSpelling() {
+            const slots = document.querySelectorAll('.empty-slot');
+            slots.forEach(slot => {
+                slot.innerText = '';
+                slot.classList.remove('border-blue-500', 'bg-blue-50');
+                slot.classList.add('border-gray-300');
+            });
+            
+            const buttons = document.querySelectorAll('.letter-btn');
+            buttons.forEach(btn => btn.classList.remove('opacity-0', 'pointer-events-none'));
+            
+            spellingHistory = []; 
+        }
+
+        function checkSpellingCompletion() {
+            const currentWord = shuffledVocab[currentQuestionIndex].en.replace(/\s/g, '');
+            const slots = document.querySelectorAll('.empty-slot');
+            let formedWord = '';
+            let isFull = true;
+
+            slots.forEach(slot => {
+                if(slot.innerText === '') isFull = false;
+                formedWord += slot.innerText;
+            });
+
+            if (isFull) {
+                if (formedWord === currentWord) {
+                    // Correct
+                    slots.forEach(slot => slot.classList.add('bg-green-100', 'border-green-500', 'text-green-700'));
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        renderSpellingQuestion();
+                    }, 1000);
+                } else {
+                    // Wrong
+                    slots.forEach(slot => slot.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'animate-pulse'));
+                    setTimeout(() => {
+                        resetSpelling();
+                        slots.forEach(slot => slot.classList.remove('bg-red-100', 'border-red-500', 'text-red-700', 'animate-pulse'));
+                    }, 1000);
+                }
+            }
+        }
+
+        // --- Confetti Effect ---
+        function launchConfetti() {
+            const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff'];
+            
+            for (let i = 0; i < 100; i++) {
+                const confetto = document.createElement('div');
+                confetto.style.position = 'fixed';
+                confetto.style.left = Math.random() * 100 + 'vw';
+                confetto.style.top = '-10px';
+                confetto.style.width = '10px';
+                confetto.style.height = '10px';
+                confetto.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetto.style.zIndex = '9999';
+                confetto.style.transform = `rotate(${Math.random() * 360}deg)`;
+                
+                document.body.appendChild(confetto);
+
+                const animation = confetto.animate([
+                    { transform: `translate3d(0,0,0) rotate(0)`, opacity: 1 },
+                    { transform: `translate3d(${Math.random()*100 - 50}px, 100vh, 0) rotate(${Math.random() * 720}deg)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 2000 + 1500,
+                    easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+                });
+
+                animation.onfinish = () => confetto.remove();
+            }
+        }
+
+    </script>
+</body>
+</html>
