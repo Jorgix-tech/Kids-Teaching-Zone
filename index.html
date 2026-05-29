@@ -31,6 +31,21 @@
         .color-3 { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
         .color-4 { background: linear-gradient(135deg, #ef4444, #dc2626); }
         .color-5 { background: linear-gradient(135deg, #ec4899, #db2777); }
+
+        .category-title {
+            position: relative;
+            display: inline-block;
+        }
+        .category-title::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+            border-radius: 2px;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -53,15 +68,15 @@
             <p class="text-xl text-gray-600 font-semibold">איזה נושא נרצה לתרגל היום?</p>
         </header>
 
-        <!-- רשת האפליקציות -->
-        <div id="apps-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full">
+        <!-- אזור התוכן - יכיל את התיקיות -->
+        <div id="portal-content" class="w-full flex flex-col gap-10 pb-10">
             <!-- התוכן יוזרק לכאן דרך JS -->
         </div>
 
     </div>
 
     <!-- מסך פאנל ניהול (אדמין) -->
-    <div id="admin-screen" class="hidden flex-1 flex flex-col p-6 w-full max-w-4xl mx-auto">
+    <div id="admin-screen" class="hidden flex-1 flex flex-col p-6 w-full max-w-5xl mx-auto">
         <div class="bg-white rounded-2xl shadow-xl p-8 w-full border-t-8 border-gray-800">
             <div class="flex justify-between items-center mb-8 pb-4 border-b-2 border-gray-100">
                 <h2 class="text-3xl font-bold text-gray-800 flex items-center gap-2">
@@ -72,27 +87,42 @@
                 </button>
             </div>
 
-            <!-- טופס הוספת אפליקציה חדשה -->
-            <div class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200">
-                <h3 class="text-xl font-bold text-gray-700 mb-4">➕ הוספת משחק / כלי חדש</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- טופס הוספת/עריכת אפליקציה -->
+            <div id="admin-form-container" class="bg-gray-50 rounded-xl p-6 mb-8 border border-gray-200 shadow-sm transition-all duration-300">
+                <h3 id="form-title" class="text-xl font-bold text-gray-700 mb-4 flex items-center gap-2">
+                    <span>➕</span> הוספת משחק / כלי חדש
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1">שם האפליקציה (למשל: חשבון)</label>
-                        <input type="text" id="new-app-name" placeholder="הכנס שם..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">שם האפליקציה</label>
+                        <input type="text" id="new-app-name" placeholder="למשל: חשבון" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1">אימוג'י / סמל (למשל: 🧮)</label>
-                        <input type="text" id="new-app-icon" placeholder="הדבק אימוג'י..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">אימוג'י / סמל</label>
+                        <input type="text" id="new-app-icon" placeholder="למשל: 🧮" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     </div>
                     <div>
-                        <label class="block text-sm font-semibold text-gray-600 mb-1">קישור (URL ב-GitHub Pages)</label>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">תיקייה (קטגוריה)</label>
+                        <input type="text" id="new-app-category" list="categories-list" placeholder="למשל: אנגלית" class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        <datalist id="categories-list"></datalist>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-600 mb-1">קישור (URL)</label>
                         <input type="text" id="new-app-url" placeholder="https://..." class="w-full px-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:outline-none dir-ltr" dir="ltr">
                     </div>
                 </div>
-                <div class="mt-4 flex justify-end">
-                    <button onclick="addNewApp()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors">
-                        שמור והוסף לפורטל
+                <div class="mt-4 flex justify-between items-center">
+                    <button id="cancel-edit-btn" onclick="cancelEdit()" class="hidden text-gray-500 hover:text-gray-800 font-bold transition-colors">
+                        ביטול עריכה ✖️
                     </button>
+                    <div class="flex-1 flex justify-end">
+                        <button id="save-app-btn" onclick="saveApp()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-colors flex items-center gap-2">
+                            <span>שמור לפורטל</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <p id="admin-error" class="text-red-500 mt-2 text-sm font-semibold hidden"></p>
             </div>
@@ -101,13 +131,14 @@
             <div>
                 <h3 class="text-xl font-bold text-gray-700 mb-4">📋 אפליקציות קיימות בפורטל:</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right border-collapse">
+                    <table class="w-full text-right border-collapse bg-white shadow-sm rounded-lg overflow-hidden">
                         <thead>
-                            <tr class="bg-gray-100 text-gray-600">
-                                <th class="p-3 rounded-tr-lg">סמל</th>
-                                <th class="p-3">שם האפליקציה</th>
-                                <th class="p-3">קישור (URL)</th>
-                                <th class="p-3 rounded-tl-lg text-center">פעולות</th>
+                            <tr class="bg-gray-100 text-gray-600 border-b-2 border-gray-200">
+                                <th class="p-4 text-center">סמל</th>
+                                <th class="p-4">שם האפליקציה</th>
+                                <th class="p-4">תיקייה</th>
+                                <th class="p-4 hidden md:table-cell">קישור</th>
+                                <th class="p-4 text-center">פעולות</th>
                             </tr>
                         </thead>
                         <tbody id="admin-apps-list">
@@ -144,28 +175,23 @@
     </div>
 
     <!-- הודעת אישור (Toast) -->
-    <div id="toast-message" class="fixed bottom-5 right-5 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50">
-        הפעולה בוצעה בהצלחה!
+    <div id="toast-message" class="fixed bottom-5 right-5 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg font-bold transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-2 border-l-4 border-green-400">
+        <span id="toast-text">הפעולה בוצעה בהצלחה!</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // === הגדרות ענן וחיבור למסד הנתונים ===
         
         let firebaseConfig;
         if (typeof __firebase_config !== 'undefined') {
-            // התחברות אוטומטית לסביבת התצוגה המקדימה (כדי שלא תקפוץ שגיאה כאן)
             firebaseConfig = JSON.parse(__firebase_config);
         } else {
-            // 🛑 הוסף את ה-firebaseConfig שלך כאן עבור GitHub 🛑
-            // החלף את כל האובייקט הזה במה שקיבלת מה-Firebase שלך!
-            // הערה: יש להגדיר משתני סביבה ב-GitHub או במערכת ה-Hosting שלך
-            // כדי למנוע חשיפה של ה-API Key.
             firebaseConfig = {
-                apiKey: window.env?.FIREBASE_API_KEY || "AIzaSyB9ATc7fsyds8e-zLiQuN8vCo9-CfnO6C0", // <-- השארת ה-API כגיבוי רק אם משתנה הסביבה לא זמין
+                apiKey: window.env?.FIREBASE_API_KEY || "AIzaSyB9ATc7fsyds8e-zLiQuN8vCo9-CfnO6C0",
                 authDomain: "kids-portal-bd.firebaseapp.com",
                 projectId: "kids-portal-bd",
                 storageBucket: "kids-portal-bd.firebasestorage.app",
@@ -179,19 +205,18 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
         
-        // מזהה קבוע לאפליקציה ב-Firestore
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'kids-portal-main'; 
         
         let currentUser = null;
         let unsubscribeDb = null;
 
         // === נתונים והגדרות ===
-        const ADMIN_PIN = "1122"; // סיסמת כניסה לפאנל
+        const ADMIN_PIN = "1122"; 
         let currentApps = [];
+        let editingAppId = null; // משתנה למעקב אם אנחנו בעריכה של כלי קיים
 
-        // === אתחול האפליקציה והתחברות לענן ===
+        // === אתחול האפליקציה ===
         async function init() {
-            // התחברות
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
@@ -200,10 +225,9 @@
                 }
             } catch (error) {
                 console.error("שגיאה בהתחברות ל-Firebase:", error);
-                showToast("ישנה בעיה בהתחברות לשרת, נסה לרענן את העמוד.");
+                showToast("ישנה בעיה בהתחברות לשרת.");
             }
 
-            // האזנה לשינויים במצב ההתחברות
             onAuthStateChanged(auth, (user) => {
                 currentUser = user;
                 if (user) {
@@ -213,35 +237,28 @@
                 }
             });
             
-            // הוספת האזנה למקש אנטר במסך ההתחברות
             document.getElementById('admin-pin').addEventListener('keypress', function (e) {
-                if (e.key === 'Enter') {
-                    checkPin();
-                }
+                if (e.key === 'Enter') checkPin();
             });
         }
 
-        // === האזנה לנתונים בזמן אמת מהענן ===
+        // === האזנה לנתונים בזמן אמת ===
         function setupDatabaseListener() {
             if (!currentUser) return;
 
-            // נתיב ציבורי משותף לכל המכשירים של הפורטל הזה
             const appsRef = collection(db, 'artifacts', appId, 'public', 'data', 'apps');
             
-            // onSnapshot מאזין בזמן אמת לכל שינוי בענן!
             unsubscribeDb = onSnapshot(appsRef, (snapshot) => {
                 currentApps = [];
                 snapshot.forEach((doc) => {
                     currentApps.push({ id: doc.id, ...doc.data() });
                 });
                 
-                // סידור האפליקציות לפי תאריך יצירה (החדש ביותר בסוף)
                 currentApps.sort((a, b) => a.createdAt - b.createdAt);
 
-                // עדכון התצוגה בכל פעם שיש שינוי בענן
                 renderPortal();
+                updateCategoriesDatalist();
                 
-                // אם פאנל האדמין פתוח, נרענן גם אותו
                 if (!document.getElementById('admin-screen').classList.contains('hidden')) {
                     renderAdminTable();
                 }
@@ -252,6 +269,20 @@
 
         function generateId() {
             return Math.random().toString(36).substr(2, 9);
+        }
+
+        // מחלץ את כל התיקיות הייחודיות להשלמה אוטומטית בטופס
+        function updateCategoriesDatalist() {
+            const datalist = document.getElementById('categories-list');
+            datalist.innerHTML = '';
+            
+            const categories = new Set(currentApps.map(app => app.category || 'כללי'));
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                datalist.appendChild(option);
+            });
         }
 
         // === ניהול תצוגה (UI) ===
@@ -269,37 +300,73 @@
         }
 
         function renderPortal() {
-            const grid = document.getElementById('apps-grid');
-            grid.innerHTML = '';
+            const container = document.getElementById('portal-content');
+            container.innerHTML = '';
 
             if (currentApps.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center text-gray-500 mt-10 text-xl font-bold">עדיין לא הוספו משחקים או שהם נטענים... בקשו מההורים להוסיף דרך פאנל הניהול! 🛠️</div>`;
+                container.innerHTML = `<div class="text-center text-gray-500 mt-10 text-xl font-bold">עדיין לא הוספו משחקים... בקשו מההורים להוסיף דרך פאנל הניהול! 🛠️</div>`;
                 return;
             }
 
-            currentApps.forEach((appItem, index) => {
-                const colorClass = `color-${index % 6}`; 
-                
-                const card = document.createElement('a');
-                card.href = appItem.url;
-                card.className = `tool-card ${colorClass} text-white rounded-3xl p-8 flex flex-col items-center justify-center text-center gap-4 cursor-pointer no-underline block`;
-                
-                if(appItem.url === "#" || appItem.url === "") {
-                    card.onclick = (e) => {
-                        e.preventDefault();
-                        showToast("עדיין לא הוגדר קישור לאפליקציה זו. כנסו לאדמין לעדכן!");
-                    }
+            // קיבוץ אפליקציות לפי תיקייה (קטגוריה)
+            const groupedApps = {};
+            currentApps.forEach(app => {
+                // אם לכלי אין קטגוריה, הוא ישויך ל"כללי"
+                const category = app.category || 'כללי';
+                if (!groupedApps[category]) {
+                    groupedApps[category] = [];
                 }
+                groupedApps[category].push(app);
+            });
 
-                card.innerHTML = `
-                    <span class="text-7xl drop-shadow-lg">${appItem.icon || '⭐'}</span>
-                    <h2 class="text-3xl font-extrabold drop-shadow-md">${appItem.name}</h2>
-                    <div class="mt-2 bg-white bg-opacity-20 px-6 py-2 rounded-full font-semibold text-lg flex items-center gap-2">
-                        כניסה <span>▶</span>
+            // רינדור כל קבוצה (תיקייה)
+            let colorIndexCounter = 0;
+            
+            for (const [category, apps] of Object.entries(groupedApps)) {
+                // יצירת אזור לתיקייה
+                const section = document.createElement('div');
+                section.className = 'w-full';
+                
+                // כותרת התיקייה
+                const titleHtml = `
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-extrabold text-gray-800 category-title">📁 ${category}</h2>
                     </div>
                 `;
-                grid.appendChild(card);
-            });
+                
+                // יצירת הגריד של האפליקציות באותה תיקייה
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full';
+                
+                apps.forEach((appItem) => {
+                    const colorClass = `color-${colorIndexCounter % 6}`; 
+                    colorIndexCounter++;
+                    
+                    const card = document.createElement('a');
+                    card.href = appItem.url;
+                    card.className = `tool-card ${colorClass} text-white rounded-3xl p-6 flex flex-col items-center justify-center text-center gap-3 cursor-pointer no-underline block`;
+                    
+                    if(appItem.url === "#" || appItem.url === "") {
+                        card.onclick = (e) => {
+                            e.preventDefault();
+                            showToast("עדיין לא הוגדר קישור לאפליקציה זו. כנסו לאדמין לעדכן!");
+                        }
+                    }
+
+                    card.innerHTML = `
+                        <span class="text-6xl drop-shadow-lg">${appItem.icon || '⭐'}</span>
+                        <h3 class="text-2xl font-extrabold drop-shadow-md leading-tight">${appItem.name}</h3>
+                        <div class="mt-auto bg-white bg-opacity-20 px-5 py-2 rounded-full font-semibold text-sm flex items-center gap-2">
+                            כניסה <span>▶</span>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+
+                section.innerHTML = titleHtml;
+                section.appendChild(grid);
+                container.appendChild(section);
+            }
         }
 
         function renderAdminTable() {
@@ -307,24 +374,32 @@
             list.innerHTML = '';
 
             if (currentApps.length === 0) {
-                list.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">אין אפליקציות מוגדרות.</td></tr>`;
+                list.innerHTML = `<tr><td colspan="5" class="text-center p-6 text-gray-500">אין אפליקציות מוגדרות.</td></tr>`;
                 return;
             }
 
             currentApps.forEach(appItem => {
                 const tr = document.createElement('tr');
-                tr.className = "border-b border-gray-100 hover:bg-gray-50";
+                tr.className = "border-b border-gray-100 hover:bg-gray-50 transition-colors";
                 
+                const categoryBadge = appItem.category ? 
+                    `<span class="bg-purple-100 text-purple-800 text-xs font-bold px-2 py-1 rounded-md border border-purple-200">${appItem.category}</span>` : 
+                    `<span class="bg-gray-200 text-gray-600 text-xs font-bold px-2 py-1 rounded-md">כללי</span>`;
+
                 tr.innerHTML = `
-                    <td class="p-3 text-3xl text-center w-16">${appItem.icon}</td>
-                    <td class="p-3 font-bold text-gray-800">${appItem.name}</td>
-                    <td class="p-3 text-left dir-ltr w-1/2">
-                        <div class="truncate max-w-xs text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100" dir="ltr">
+                    <td class="p-4 text-3xl text-center w-16">${appItem.icon || '⭐'}</td>
+                    <td class="p-4 font-bold text-gray-800 text-lg">${appItem.name}</td>
+                    <td class="p-4">${categoryBadge}</td>
+                    <td class="p-4 text-left dir-ltr hidden md:table-cell max-w-xs">
+                        <div class="truncate text-blue-500 text-sm bg-blue-50 px-2 py-1 rounded border border-blue-100" dir="ltr" title="${appItem.url}">
                             ${appItem.url}
                         </div>
                     </td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteApp('${appItem.id}')" class="text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-bold py-1 px-3 rounded transition-colors text-sm">
+                    <td class="p-4 text-center flex justify-center gap-2">
+                        <button onclick="startEdit('${appItem.id}')" class="text-blue-500 hover:text-white border border-blue-500 hover:bg-blue-500 font-bold py-1 px-3 rounded transition-colors text-sm" title="ערוך אפליקציה">
+                            ערוך ✏️
+                        </button>
+                        <button onclick="deleteApp('${appItem.id}')" class="text-red-500 hover:text-white border border-red-500 hover:bg-red-500 font-bold py-1 px-3 rounded transition-colors text-sm" title="מחק אפליקציה">
                             מחק 🗑️
                         </button>
                     </td>
@@ -333,8 +408,69 @@
             });
         }
 
-        // === פונקציות אדמין - כתיבה לענן ===
-        async function addNewApp() {
+        // === פונקציות אדמין (שמירה / עריכה / מחיקה) ===
+        
+        function startEdit(id) {
+            const appToEdit = currentApps.find(a => a.id === id);
+            if (!appToEdit) return;
+
+            editingAppId = id; // שומרים את המזהה
+            
+            // מילוי הטופס בנתונים הקיימים
+            document.getElementById('new-app-name').value = appToEdit.name || '';
+            document.getElementById('new-app-icon').value = appToEdit.icon || '';
+            document.getElementById('new-app-url').value = appToEdit.url || '';
+            document.getElementById('new-app-category').value = appToEdit.category || 'כללי';
+            
+            // שינוי נראות הטופס
+            document.getElementById('form-title').innerHTML = `<span>✏️</span> עריכת כלי: <span class="text-blue-600">${appToEdit.name}</span>`;
+            
+            const saveBtn = document.getElementById('save-app-btn');
+            saveBtn.innerHTML = `
+                <span>עדכן כלי</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            `;
+            saveBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+            saveBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            
+            // גלילה חלקה למעלה לטופס
+            document.getElementById('admin-form-container').scrollIntoView({ behavior: 'smooth' });
+            // הבלטה זמנית של הטופס
+            document.getElementById('admin-form-container').classList.add('ring-4', 'ring-blue-200');
+            setTimeout(() => document.getElementById('admin-form-container').classList.remove('ring-4', 'ring-blue-200'), 1000);
+        }
+
+        function cancelEdit() {
+            editingAppId = null;
+            
+            // איפוס הטופס
+            document.getElementById('new-app-name').value = '';
+            document.getElementById('new-app-icon').value = '';
+            document.getElementById('new-app-url').value = '';
+            document.getElementById('new-app-category').value = '';
+            
+            // חזרה למצב הוספה
+            document.getElementById('form-title').innerHTML = `<span>➕</span> הוספת משחק / כלי חדש`;
+            
+            const saveBtn = document.getElementById('save-app-btn');
+            saveBtn.innerHTML = `
+                <span>שמור לפורטל</span>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+            `;
+            saveBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            saveBtn.classList.add('bg-green-500', 'hover:bg-green-600');
+            
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            document.getElementById('admin-error').classList.add('hidden');
+        }
+
+        async function saveApp() {
             if (!currentUser) {
                 showToast("מתחבר לשרת, אנא המתן שניה ונסה שוב.");
                 return;
@@ -343,11 +479,13 @@
             const nameInput = document.getElementById('new-app-name');
             const iconInput = document.getElementById('new-app-icon');
             const urlInput = document.getElementById('new-app-url');
+            const catInput = document.getElementById('new-app-category');
             const errorMsg = document.getElementById('admin-error');
 
             const name = nameInput.value.trim();
             const icon = iconInput.value.trim() || '⭐';
             const url = urlInput.value.trim();
+            const category = catInput.value.trim() || 'כללי'; // ברירת מחדל אם ריק
 
             if (!name || !url) {
                 errorMsg.textContent = "חובה להזין שם וקישור URL.";
@@ -356,21 +494,26 @@
             }
             errorMsg.classList.add('hidden');
 
-            const newId = generateId();
-            const newApp = { name, icon, url, createdAt: Date.now() };
-
             try {
-                // שמירה בענן!
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', newId);
-                await setDoc(docRef, newApp);
+                if (editingAppId) {
+                    // מצב עדכון של כלי קיים
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', editingAppId);
+                    await updateDoc(docRef, { name, icon, url, category });
+                    showToast("הכלי עודכן ושובץ בתיקייה בהצלחה! ✅");
+                } else {
+                    // מצב הוספת כלי חדש
+                    const newId = generateId();
+                    const newApp = { name, icon, url, category, createdAt: Date.now() };
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', newId);
+                    await setDoc(docRef, newApp);
+                    showToast("האפליקציה נוספה בהצלחה! ✨");
+                }
                 
-                // הניקוי יקרה מיד, הטבלה תתרענן אוטומטית בזכות ה-onSnapshot
-                nameInput.value = '';
-                iconInput.value = '';
-                urlInput.value = '';
-                showToast("האפליקציה נוספה בהצלחה לענן!");
+                // חזרה למצב הוספה רגיל וניקוי הטופס
+                cancelEdit();
+                
             } catch (error) {
-                console.error("שגיאה בהוספה:", error);
+                console.error("שגיאה בשמירה:", error);
                 errorMsg.textContent = "שגיאה בשמירה לענן.";
                 errorMsg.classList.remove('hidden');
             }
@@ -379,12 +522,15 @@
         async function deleteApp(id) {
             if (!currentUser) return;
 
-            if(confirm("האם למחוק את האפליקציה מהפורטל בכל המכשירים?")) {
+            if(confirm("האם למחוק את הכלי מהפורטל? פעולה זו תסיר אותו מכל המכשירים.")) {
                 try {
-                    // מחיקה מהענן
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'apps', id);
                     await deleteDoc(docRef);
-                    showToast("האפליקציה נמחקה מהענן.");
+                    showToast("האפליקציה נמחקה מהפורטל. 🗑️");
+                    
+                    if (editingAppId === id) {
+                        cancelEdit(); // אם היינו באמצע עריכה של מה שנמחק
+                    }
                 } catch (error) {
                     console.error("שגיאה במחיקה:", error);
                 }
@@ -437,8 +583,9 @@
         // === הודעות (Toasts) ===
         function showToast(message) {
             const toast = document.getElementById('toast-message');
-            toast.textContent = message;
+            const toastText = document.getElementById('toast-text');
             
+            toastText.textContent = message;
             toast.classList.remove('translate-y-20', 'opacity-0');
             
             setTimeout(() => {
@@ -446,16 +593,15 @@
             }, 3000);
         }
 
-        // מכיוון שאנחנו משתמשים ב- type="module", פונקציות הופכות למקומיות.
-        // אנחנו צריכים לחשוף אותן ל-window כדי שה-HTML (onclick) יוכל להפעיל אותן.
         window.openLoginModal = openLoginModal;
         window.closeLoginModal = closeLoginModal;
         window.checkPin = checkPin;
         window.showScreen = showScreen;
-        window.addNewApp = addNewApp;
+        window.saveApp = saveApp;
+        window.startEdit = startEdit;
+        window.cancelEdit = cancelEdit;
         window.deleteApp = deleteApp;
 
-        // הפעלת האפליקציה
         window.onload = init;
 
     </script>
