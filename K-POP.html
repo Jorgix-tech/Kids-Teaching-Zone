@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>K-Pop Math Demon Hunters: Mega Ultimate</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Rubik', sans-serif;
+            background-color: #050510;
+            color: white;
+            overflow: hidden; 
+            touch-action: none;
+            transition: background 0.5s ease;
+        }
+
+        /* Backgrounds */
+        .bg-default { background-image: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); background-color: #050510; }
+        .bg-stage { background: radial-gradient(circle at 50% 0%, #4a00e0 0%, #050510 70%); background-size: cover; }
+        .bg-city { background-color: #000020; background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 255, .3) 25%, rgba(0, 255, 255, .3) 26%, transparent 27%, transparent 74%, rgba(0, 255, 255, .3) 75%, rgba(0, 255, 255, .3) 76%, transparent 77%, transparent); background-size: 50px 50px; }
+        .bg-forest { background-color: #051005; background-image: radial-gradient(white, rgba(255,255,255,.2) 2px, transparent 3px), radial-gradient(white, rgba(255,255,255,.15) 1px, transparent 2px), radial-gradient(white, rgba(255,255,255,.1) 2px, transparent 3px); background-size: 550px 550px, 350px 350px, 250px 250px; background-position: 0 0, 40px 60px, 130px 270px; }
+
+        .hidden-screen { display: none !important; }
+        .force-ltr { direction: ltr !important; unicode-bidi: bidi-override; }
+
+        /* Effects */
+        .neon-text-pink { text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
+        .neon-text-gold { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700; color: #ffd700; }
+        .neon-border-red { box-shadow: 0 0 15px #ff0000; border-color: #ff0000 !important; }
+
+        /* Floating Text Animation */
+        .floating-text {
+            position: absolute;
+            font-weight: 900;
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px orange;
+            pointer-events: none;
+            animation: floatUp 1s ease-out forwards;
+            z-index: 100;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+        }
+
+        /* Boss Bubble */
+        .boss-bubble {
+            position: absolute;
+            top: -90px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            color: black;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            z-index: 70;
+            box-shadow: 0 0 15px rgba(255,0,0,0.5);
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .boss-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 10px 10px 0;
+            border-style: solid;
+            border-color: white transparent transparent transparent;
+        }
+        @keyframes popIn { from { transform: translateX(-50%) scale(0); } to { transform: translateX(-50%) scale(1); } }
+
+        /* Standard Styles */
+        .boss-hp-container { width: 100%; height: 18px; background: #330000; border: 2px solid #ff0000; border-radius: 10px; overflow: hidden; box-shadow: 0 0 15px #ff0000; position: absolute; top: -30px; left: 0; z-index: 60; }
+        .boss-hp-fill { height: 100%; background: linear-gradient(90deg, #ff0000, #ff6666); transition: width 0.3s ease-out; }
+        .combo-fire { box-shadow: 0 0 15px #ff4500, inset 0 0 10px #ff4500; border-color: #ff4500 !important; animation: pulse-red 1s infinite; }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 10px #ff4500; } 50% { box-shadow: 0 0 25px #ff4500; } 100% { box-shadow: 0 0 10px #ff4500; } }
+        .mode-btn-active { background: linear-gradient(45deg, #00ffff, #0099ff); border-color: #ffffff; color: black; box-shadow: 0 0 15px #00ffff; transform: scale(1.02); }
+        .demon-float { animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px) rotate(-5deg); } 75% { transform: translateX(5px) rotate(5deg); } 100% { transform: translateX(0); } }
+        .boss-damage { animation: boss-hit 0.3s; }
+        @keyframes boss-hit { 0% { filter: sepia(0) saturate(1) scale(1.2); } 50% { filter: sepia(1) saturate(5) hue-rotate(-50deg) scale(1.1); } 100% { filter: sepia(0) saturate(1) scale(1.2); } }
+        .boss-entrance { animation: boss-scale 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes boss-scale { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1.2); opacity: 1; } }
+        .char-card { border: 3px solid #ff00ff; box-shadow: 0 0 20px rgba(255, 0, 255, 0.4); border-radius: 20px; overflow: hidden; background: rgba(0,0,0,0.5); transition: all 0.3s; }
+        .shop-item { border: 2px solid #333; background: #1a1a2e; transition: all 0.2s; position: relative; }
+        .shop-item.owned { border-color: #00ff00; }
+        .shop-item.equipped { border-color: #00ffff; box-shadow: 0 0 10px #00ffff; }
+        .kpop-btn { background: linear-gradient(45deg, #ff00cc, #333399); transition: transform 0.1s; }
+        .kpop-btn:active { transform: scale(0.95); }
+        .option-btn { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); -webkit-user-select: none; user-select: none; }
+        .correct-answer { background-color: #00ff00 !important; color: black !important; box-shadow: 0 0 20px #00ff00; }
+        .wrong-answer { background-color: #ff0000 !important; color: white; box-shadow: 0 0 20px #ff0000; }
+        .disabled-opt { opacity: 0.2; pointer-events: none; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px); }
+        .mistake-item { background: rgba(255,0,0,0.1); border-right: 4px solid #ff0000; padding: 10px; border-radius: 8px; margin-bottom: 8px; text-align: right; }
+        
+        .particle { position: absolute; pointer-events: none; animation: particle-explode 0.8s ease-out forwards; border-radius: 50%; }
+        @keyframes particle-explode { 0% { transform: translate(0, 0) scale(1); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; } }
+        
+        .achievement-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s; }
+        .achievement-unlocked { background: linear-gradient(45deg, rgba(255,215,0,0.1), rgba(255,165,0,0.1)); border-color: #ffd700; box-shadow: 0 0 10px rgba(255,215,0,0.2); }
+        .grayscale-icon { filter: grayscale(100%); opacity: 0.5; }
+        .achievement-unlocked .grayscale-icon { filter: grayscale(0%); opacity: 1; }
+    </style>
+</head>
+<body id="main-body" class="h-[100dvh] w-full flex items-center justify-center bg-default">
+
+    <div id="particles-container" class="fixed inset-0 pointer-events-none z-[150]"></div>
+
+    <div class="w-full max-w-md h-full max-h-[100dvh] p-4 flex flex-col relative overflow-y-auto">
+        
+        <!-- Controls: Music & Speech -->
+        <div class="absolute top-4 left-4 z-[80] flex gap-2">
+            <button onclick="toggleMusic()" class="p-2 bg-gray-800/80 rounded-full border border-gray-600 text-cyan-400 shadow-lg">
+                <i id="music-icon" data-lucide="volume-x" class="w-6 h-6"></i>
+            </button>
+            <button onclick="toggleSpeech()" class="p-2 bg-gray-800/80 rounded-full border border-gray-600 text-pink-400 shadow-lg transition-all" id="speech-btn">
+                <i id="speech-icon" data-lucide="mic-off" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- --- MODALS --- -->
+        
+        <!-- Quit -->
+        <div id="quit-modal" class="hidden-screen fixed inset-0 z-[100] modal-overlay flex items-center justify-center p-4">
+            <div class="bg-gray-900 border-2 border-pink-500 rounded-2xl p-6 w-full max-w-xs text-center shadow-[0_0_30px_rgba(255,0,255,0.3)]">
+                <h3 class="text-2xl font-bold text-white mb-2">לצאת מהמשימה?</h3>
+                <div class="flex gap-4 justify-center mt-6">
+                    <button onclick="closeModal('quit-modal')" class="flex-1 py-3 rounded-xl bg-gray-700 font-bold">ביטול</button>
+                    <button onclick="confirmQuit()" class="flex-1 py-3 rounded-xl bg-red-600 font-bold">צא</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Buy -->
+        <div id="buy-modal" class="hidden-screen fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-4">
+            <div class="bg-gray-900 border-2 border-yellow-500 rounded-2xl p-6 w-full max-w-xs text-center shadow-lg">
+                <h3 class="text-xl font-bold text-white mb-4">אישור קנייה</h3>
+                <div class="bg-black/50 p-4 rounded-xl mb-6 space-y-2 font-mono text-lg">
+                    <div class="flex justify-between text-gray-400"><span>יש לך:</span><span id="buy-current" class="text-yellow-400" dir="ltr">1000</span></div>
+                    <div class="flex justify-between text-red-400"><span>מחיר:</span><span id="buy-price" class="text-red-400" dir="ltr">-500</span></div>
+                    <div class="border-t border-gray-600 my-2"></div>
+                    <div class="flex justify-between font-bold" id="buy-result-row">
+                        <span id="buy-result-label">יישאר:</span>
+                        <span id="buy-remain" dir="ltr">500</span>
+                    </div>
+                </div>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="closeModal('buy-modal')" class="flex-1 py-3 rounded-xl bg-gray-700 font-bold">ביטול</button>
+                    <button id="buy-confirm-btn" onclick="confirmPurchase()" class="flex-1 py-3 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-black font-bold">קנה!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shop -->
+        <div id="shop-modal" class="hidden-screen fixed inset-0 z-[90] modal-overlay flex flex-col p-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-3xl font-black neon-text-gold italic">החנות</h2>
+                <button onclick="closeModal('shop-modal')" class="p-2 bg-gray-800 rounded-full"><i data-lucide="x"></i></button>
+            </div>
+            <div class="bg-gray-800/80 p-3 rounded-xl mb-2 flex justify-between items-center border border-yellow-500/30">
+                <span class="text-gray-300">ארנק:</span>
+                <div class="flex items-center gap-2 text-2xl font-bold text-yellow-400"><i data-lucide="coins" class="w-5 h-5"></i><span id="shop-coins">0</span></div>
+            </div>
+            <div class="flex gap-2 mb-4">
+                <button onclick="switchShopTab('chars')" id="tab-chars" class="flex-1 py-2 rounded-lg bg-pink-600 text-white font-bold text-sm">דמויות</button>
+                <button onclick="switchShopTab('bgs')" id="tab-bgs" class="flex-1 py-2 rounded-lg bg-gray-700 text-gray-400 font-bold text-sm">רקעים</button>
+            </div>
+            <div class="flex-grow overflow-y-auto pb-8 pr-1">
+                <div class="grid grid-cols-2 gap-4" id="shop-grid"></div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div id="achievements-modal" class="hidden-screen fixed inset-0 z-[120] modal-overlay flex flex-col p-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-yellow-400 neon-text-gold italic">היכל התהילה</h2>
+                <button onclick="closeModal('achievements-modal')" class="p-2 bg-gray-800 rounded-full"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex-grow overflow-y-auto space-y-4" id="achievements-list"></div>
+        </div>
+
+        <!-- High Scores (NEW) -->
+        <div id="highscores-modal" class="hidden-screen fixed inset-0 z-[120] modal-overlay flex flex-col p-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-black text-cyan-400 neon-text-blue italic">שיאי הציד</h2>
+                <button onclick="closeModal('highscores-modal')" class="p-2 bg-gray-800 rounded-full"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex-grow overflow-y-auto space-y-2" id="highscores-list">
+                <!-- Injected JS -->
+            </div>
+        </div>
+
+        <!-- Daily Streak (NEW) -->
+        <div id="daily-modal" class="hidden-screen fixed inset-0 z-[130] modal-overlay flex items-center justify-center p-4">
+            <div class="bg-gray-900 border-2 border-green-500 rounded-2xl p-6 w-full max-w-xs text-center shadow-2xl animate-bounce">
+                <div class="text-6xl mb-4">🔥</div>
+                <h3 class="text-2xl font-bold text-white mb-2">בונוס יומי!</h3>
+                <p class="text-gray-300 mb-4">רצף ימים: <span id="daily-streak-count" class="font-bold text-yellow-400 text-xl">1</span></p>
+                <div class="bg-black/40 p-4 rounded-xl mb-4 text-yellow-400 font-black text-3xl flex items-center justify-center gap-2">
+                    +<span id="daily-reward-amount">50</span> <i data-lucide="coins" class="w-6 h-6"></i>
+                </div>
+                <button onclick="claimDaily()" class="w-full py-3 rounded-xl bg-green-600 font-bold hover:bg-green-500">איסוף!</button>
+            </div>
+        </div>
+
+        <!-- Mistakes -->
+        <div id="mistakes-modal" class="hidden-screen fixed inset-0 z-[120] modal-overlay flex flex-col p-4 animate-fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-black text-red-500 italic">ניתוח קרב</h2>
+                <button onclick="closeModal('mistakes-modal')" class="p-2 bg-gray-800 rounded-full"><i data-lucide="x"></i></button>
+            </div>
+            <div class="flex-grow overflow-y-auto pb-4" id="mistakes-list"></div>
+            <button onclick="closeModal('mistakes-modal')" class="w-full py-3 rounded-xl bg-gray-700 font-bold mt-2">סגור</button>
+        </div>
+
+        <!-- Notif -->
+        <div id="achieve-notif" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-yellow-600 border-2 border-yellow-300 text-black px-6 py-4 rounded-xl shadow-2xl z-[200] hidden-screen animate-bounce flex items-center gap-3">
+            <i data-lucide="trophy" class="w-8 h-8"></i>
+            <div>
+                <div class="font-black uppercase text-xs">הישג חדש!</div>
+                <div id="achieve-title" class="font-bold text-lg">שם ההישג</div>
+            </div>
+        </div>
+
+        <!-- --- SCREENS --- -->
+
+        <!-- 1. Intro Screen -->
+        <div id="intro-screen" class="flex flex-col items-center justify-center h-full text-center space-y-6">
+            <div class="space-y-2">
+                <h1 class="text-5xl font-black neon-text-pink tracking-tighter uppercase italic leading-tight">Math<br>Demon<br>Hunters</h1>
+                <p class="text-cyan-300 text-sm tracking-widest mt-2">הצטרפי ליחידת החיסול</p>
+            </div>
+            
+            <div class="w-full relative px-4 space-y-3">
+                <input type="text" id="player-name" placeholder="שם הציידת..." class="w-full bg-gray-900 text-white border border-gray-700 rounded-xl p-4 text-center text-xl focus:outline-none focus:border-pink-500 placeholder-gray-600">
+                
+                <div class="flex gap-2 justify-center">
+                    <div class="flex items-center gap-1 text-yellow-400 font-bold bg-gray-800 px-4 py-2 rounded-xl">
+                        <i data-lucide="coins" class="w-4 h-4"></i> <span id="intro-coins">0</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="openShop()" class="py-3 bg-gray-800 border border-yellow-500/50 rounded-xl text-yellow-400 font-bold flex flex-col items-center justify-center gap-1 hover:bg-gray-700">
+                        <i data-lucide="shopping-bag" class="w-5 h-5"></i> <span class="text-xs">חנות</span>
+                    </button>
+                    <button onclick="openAchievements()" class="py-3 bg-gray-800 border border-purple-500/50 rounded-xl text-purple-400 font-bold flex flex-col items-center justify-center gap-1 hover:bg-gray-700">
+                        <i data-lucide="trophy" class="w-5 h-5"></i> <span class="text-xs">הישגים</span>
+                    </button>
+                    <button onclick="openHighScores()" class="py-3 bg-gray-800 border border-cyan-500/50 rounded-xl text-cyan-400 font-bold flex flex-col items-center justify-center gap-1 hover:bg-gray-700">
+                        <i data-lucide="crown" class="w-5 h-5"></i> <span class="text-xs">שיאים</span>
+                    </button>
+                </div>
+
+                <button onclick="goToSettings()" class="kpop-btn w-full py-5 rounded-2xl font-bold text-xl shadow-lg hover:shadow-pink-500/50 uppercase tracking-wider text-white mt-2">
+                    התחלה
+                </button>
+            </div>
+        </div>
+
+        <!-- 2. Settings Screen -->
+        <div id="settings-screen" class="hidden-screen flex flex-col h-full relative pt-12 pb-4">
+            <button onclick="goHome()" class="absolute top-2 right-2 p-3 bg-gray-800 rounded-full text-white hover:bg-gray-700 z-50 border border-gray-600"><i data-lucide="home" class="w-5 h-5"></i></button>
+
+            <h2 class="text-2xl font-bold neon-text-blue text-center mb-4">בחרי משימה</h2>
+            
+            <div class="flex-grow flex flex-col space-y-4 px-2 overflow-y-auto pb-24">
+                <div class="bg-gray-900/80 p-3 rounded-2xl border border-cyan-500/30 flex justify-between items-center px-6">
+                    <span class="text-cyan-300 font-bold">זמן (דק')</span>
+                    <div class="flex items-center gap-4">
+                        <button onclick="adjustTime(-1)" class="w-8 h-8 rounded-full bg-gray-700 font-bold">-</button>
+                        <span id="time-display" class="font-mono text-xl w-12 text-center">03</span>
+                        <button onclick="adjustTime(1)" class="w-8 h-8 rounded-full bg-gray-700 font-bold">+</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <p class="text-center text-xs text-gray-500 uppercase tracking-widest mb-2">רמות בסיס</p>
+                    <button onclick="setMode(1)" id="mode-btn-1" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>חיבור וחיסור עד 10</span> <span class="text-xs text-pink-400 force-ltr">5 + 3</span>
+                    </button>
+                    <button onclick="setMode(2)" id="mode-btn-2" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>כפל וחילוק עד 5</span> <span class="text-xs text-cyan-400 force-ltr">2 × 3</span>
+                    </button>
+                    <button onclick="setMode(3)" id="mode-btn-3" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>כפל וחילוק עד 10</span> <span class="text-xs text-purple-400 force-ltr">8 × 9</span>
+                    </button>
+
+                    <p class="text-center text-xs text-gray-500 uppercase tracking-widest mt-4 mb-2">רמות מתקדמות (כיתה ג')</p>
+                    <button onclick="setMode(4)" id="mode-btn-4" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>מגדל ה-100 (חיבור/חיסור)</span> <span class="text-xs text-yellow-400 force-ltr">45 + 23</span>
+                    </button>
+                    <button onclick="setMode(5)" id="mode-btn-5" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>פענוח צפנים (נעלמים)</span> <span class="text-xs text-green-400 force-ltr">? + 5 = 12</span>
+                    </button>
+                    <button onclick="setMode(6)" id="mode-btn-6" class="mode-btn w-full p-3 rounded-xl border border-gray-600 bg-gray-800 text-right flex justify-between">
+                        <span>שרשרת כשפים</span> <span class="text-xs text-red-400 force-ltr">10 - 2 + 5</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="fixed bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black to-transparent">
+                <button onclick="startGame()" class="kpop-btn w-full py-4 rounded-2xl font-bold text-xl shadow-lg uppercase text-white">
+                    צא לציד!
+                </button>
+            </div>
+        </div>
+
+        <!-- 3. Game Screen -->
+        <div id="game-screen" class="hidden-screen flex flex-col h-full py-2 relative">
+            
+            <div class="flex justify-between items-start z-40 pl-24"> <!-- Extra padding for 2 buttons -->
+                <button onclick="openModal('quit-modal')" class="w-10 h-10 flex items-center justify-center bg-gray-800/80 rounded-full text-white border border-gray-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+                
+                <div class="flex flex-col items-center">
+                    <span id="current-mode-title" class="px-3 py-1 bg-black/60 rounded-full border border-pink-500/30 text-[10px] font-bold text-pink-200 tracking-wider">MODE</span>
+                    <div id="combo-container" class="opacity-0 transition-all duration-300 mt-1">
+                        <span id="combo-text" class="text-2xl font-black italic text-yellow-400 neon-text-gold">x2 COMBO!</span>
+                    </div>
+                </div>
+
+                <button onclick="useLifeline()" id="lifeline-btn" class="w-12 h-12 flex flex-col items-center justify-center bg-blue-900/80 rounded-full text-white border border-blue-400 shadow-lg active:scale-90 transition">
+                    <span class="text-xs font-bold">50:50</span>
+                    <span class="text-[10px] text-yellow-300">-50<i data-lucide="coins" class="w-3 h-3 inline"></i></span>
+                </button>
+            </div>
+
+            <div class="flex justify-between items-center mb-2 bg-gray-900/80 p-2 rounded-xl border border-gray-700 mt-2 shadow-lg">
+                <div class="flex flex-col pl-2">
+                    <span class="text-[10px] text-gray-400">Time</span>
+                    <span id="game-timer" class="force-ltr font-mono text-xl text-cyan-400 font-bold">00:00</span>
+                </div>
+                <div class="text-center">
+                    <span class="text-[10px] text-gray-400">Target</span>
+                    <div class="text-xl font-bold text-white"><span id="q-current">1</span><span class="text-sm text-gray-500">/20</span></div>
+                </div>
+                <div class="flex flex-col items-end pr-2">
+                    <span class="text-[10px] text-gray-400">Score</span>
+                    <span id="score-display" class="font-mono text-xl text-pink-500 font-bold">0</span>
+                </div>
+            </div>
+
+            <div class="flex-grow flex flex-col items-center justify-center relative w-full mb-4">
+                
+                <div id="boss-warning" class="absolute -top-12 text-red-500 font-black text-2xl animate-bounce hidden-screen z-50 neon-text-pink text-center leading-tight">
+                    <div>⚠️ BOSS ⚠️</div>
+                    <div class="text-sm text-white font-normal">הביסי את ההון מון!</div>
+                </div>
+
+                <div id="demon-container" class="demon-float transition-all duration-300 relative flex flex-col items-center">
+                    <!-- Boss Dialogue Bubble -->
+                    <div id="boss-dialogue" class="boss-bubble hidden-screen">אני אשמיד אותך!</div>
+
+                    <div id="card-border" class="char-card w-40 h-40 sm:w-48 sm:h-48 relative transition-all duration-500">
+                        <img id="char-image" src="" alt="Character" class="w-full h-full object-cover">
+                        <div id="char-flash" class="absolute inset-0 bg-white opacity-0 pointer-events-none transition-opacity duration-200"></div>
+                    </div>
+                    <div id="boss-hp" class="hidden-screen boss-hp-container">
+                        <div id="boss-hp-fill" class="boss-hp-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="w-full text-center relative z-10 -mt-6">
+                    <div dir="ltr" class="bg-black/80 backdrop-blur-md border-2 border-pink-500 rounded-2xl py-4 px-6 inline-block shadow-[0_0_30px_rgba(255,0,255,0.3)] min-w-[220px]">
+                        <span id="math-question" class="text-4xl sm:text-5xl font-black text-white tracking-widest drop-shadow-lg">?</span>
+                    </div>
+                </div>
+                
+                <div id="feedback-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity duration-200 z-20 top-[-50px]">
+                    <span id="feedback-text" class="text-5xl font-black uppercase transform -rotate-12 bg-black border-4 px-6 py-4 shadow-2xl whitespace-nowrap">HIT!</span>
+                </div>
+            </div>
+
+            <div id="options-grid" class="grid grid-cols-2 gap-3 mt-auto w-full h-1/3 max-h-60" dir="ltr"></div>
+        </div>
+
+        <!-- 4. Report Screen -->
+        <div id="report-screen" class="hidden-screen flex flex-col items-center justify-center h-full space-y-4 text-center animate-fade-in relative">
+            <button onclick="goHome()" class="absolute top-2 right-2 p-3 bg-gray-800 rounded-full text-white hover:bg-gray-700 z-50 border border-gray-600"><i data-lucide="home" class="w-5 h-5"></i></button>
+
+            <h2 class="text-4xl font-black neon-text-pink italic">MISSION COMPLETE</h2>
+            
+            <div class="bg-gray-800/90 p-6 rounded-2xl border border-gray-600 w-full space-y-4 shadow-2xl">
+                <div>
+                    <p class="text-gray-400 text-xs uppercase tracking-widest">Hunter</p>
+                    <p id="report-name" class="text-2xl font-bold text-white mt-1">Name</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-900/50 p-3 rounded-xl border border-gray-700">
+                        <p class="text-gray-400 text-xs">Score</p>
+                        <p id="report-score-val" class="text-2xl font-bold text-green-400">0</p>
+                    </div>
+                    <div class="bg-gray-900/50 p-3 rounded-xl border border-gray-700 flex flex-col items-center justify-center">
+                        <p class="text-gray-400 text-xs">Earned</p>
+                        <div class="flex items-center gap-1">
+                            <i data-lucide="coins" class="w-4 h-4 text-yellow-400"></i>
+                            <span id="report-earned" class="text-2xl font-bold text-yellow-400">+50</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-gray-700">
+                    <p class="text-gray-400 text-sm mb-1 uppercase tracking-widest">Rank</p>
+                    <p id="report-rank" class="text-4xl font-black neon-text-pink drop-shadow-lg">S-CLASS</p>
+                </div>
+            </div>
+
+            <!-- New Highscore Alert -->
+            <div id="new-highscore-alert" class="hidden-screen text-yellow-400 font-black text-xl animate-bounce">
+                👑 שיא חדש! 👑
+            </div>
+
+            <div id="mistakes-btn-container" class="w-full px-4 hidden-screen">
+                <button onclick="showMistakes()" class="w-full py-2 rounded-xl bg-red-900/50 border border-red-500/50 text-red-200 font-bold hover:bg-red-900 text-sm">
+                    🔍 צפי בטעויות
+                </button>
+            </div>
+
+            <div class="w-full px-4 space-y-3">
+                <button onclick="shareResult()" class="w-full py-3 rounded-2xl font-bold text-lg bg-green-600 hover:bg-green-500 shadow-lg text-white flex items-center justify-center gap-2">
+                    <i data-lucide="share-2" class="w-5 h-5"></i> שתף
+                </button>
+                <button onclick="resetGame()" class="kpop-btn w-full py-3 rounded-2xl font-bold text-lg shadow-lg text-white">
+                    משימה חדשה
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA ---
+        const charItems = [
+            { id: 'def', name: 'Romy', price: 0, img: "https://api.dicebear.com/7.x/lorelei/svg?seed=Romy&backgroundColor=ffdfbf" },
+            { id: 'zoe', name: 'Zoe', price: 100, img: "https://api.dicebear.com/7.x/lorelei/svg?seed=Zoe&backgroundColor=b6e3f4" },
+            { id: 'mira', name: 'Mira', price: 250, img: "https://api.dicebear.com/7.x/lorelei/svg?seed=Mira&backgroundColor=c0aede" },
+            { id: 'poppy', name: 'Pinky Pop', price: 400, img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Poppy&topType=LongHairCurvy&hairColor=PastelPink&accessoriesType=Kurt&clotheType=BlazerShirt&skinColor=Light" },
+            { id: 'branch', name: 'Blue Vibe', price: 400, img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Branch&topType=ShortHairFrizzle&hairColor=Blue&skinColor=Pale&clotheType=Hoodie" },
+            { id: 'diamond', name: 'Glitter Guy', price: 600, img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Diamond&topType=ShortHairDreads01&hairColor=SilverGray&skinColor=Light&clotheType=Overall" },
+            { id: 'queen', name: 'Rock Queen', price: 800, img: "https://api.dicebear.com/7.x/avataaars/svg?seed=Barb&topType=LongHairMiaWallace&hairColor=Red&clotheType=CollarSweater&skinColor=Pale" },
+            { id: 'lulu', name: 'Lulu', price: 800, img: "https://api.dicebear.com/7.x/lorelei/svg?seed=Lulu&backgroundColor=b6e3f4" },
+            { id: 'boss', name: 'Hon Mun', price: 1500, img: "https://api.dicebear.com/7.x/bottts/svg?seed=DemonBoss&backgroundColor=1a1a1a" }
+        ];
+
+        const bgItems = [
+            { id: 'bg-default', name: 'בסיס', price: 0, class: 'bg-default' },
+            { id: 'bg-stage', name: 'במת הופעות', price: 500, class: 'bg-stage' },
+            { id: 'bg-city', name: 'עיר עתידנית', price: 750, class: 'bg-city' },
+            { id: 'bg-forest', name: 'יער קסום', price: 1000, class: 'bg-forest' }
+        ];
+
+        const achievementsList = [
+            { id: 'speed', title: 'הציידת המהירה', desc: 'עני תוך 2 שניות', icon: 'zap' },
+            { id: 'boss_slayer', title: 'מחסלת הבוסים', desc: 'הביסי 5 בוסים', icon: 'skull' },
+            { id: 'collector', title: 'האספנית', desc: 'קני 5 פריטים', icon: 'shopping-bag' }
+        ];
+
+        const modeNames = { 1: "חיבור וחיסור עד 10", 2: "כפל וחילוק עד 5", 3: "כפל וחילוק עד 10", 4: "מגדל ה-100", 5: "פענוח צפנים", 6: "שרשרת כשפים" };
+
+        let state = {
+            screen: 'intro',
+            name: '',
+            coins: 0,
+            inventory: ['def'], 
+            bgInventory: ['bg-default'], 
+            equipped: 'def',
+            equippedBg: 'bg-default',
+            achievements: [], 
+            stats: { bossKills: 0, itemsBought: 0 },
+            highScores: [], 
+            lastLogin: null, 
+            streak: 0,
+            
+            pendingBuy: null,
+            shopTab: 'chars',
+
+            timeLimit: 3, gameMode: 1, timer: 0, intervalId: null,
+            totalQuestions: 20, currentQuestion: 0, score: 0, correctCount: 0,
+            isPaused: false, combo: 0, isBossActive: false, bossHP: 3, bossMaxHP: 3,
+            mistakes: [], isMusicOn: false, isSpeechOn: false,
+            
+            questionStartTime: 0
+        };
+
+        // --- LOCAL STORAGE & STATE MANAGEMENT ---
+        function loadProgress() {
+            const saved = localStorage.getItem('demonHuntersSaveMega');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                state.coins = parsed.coins || 0;
+                state.inventory = parsed.inventory || ['def'];
+                state.bgInventory = parsed.bgInventory || ['bg-default'];
+                state.equipped = parsed.equipped || 'def';
+                state.equippedBg = parsed.equippedBg || 'bg-default';
+                state.achievements = parsed.achievements || [];
+                state.stats = parsed.stats || { bossKills: 0, itemsBought: 0 };
+                state.highScores = parsed.highScores || [];
+                state.lastLogin = parsed.lastLogin || null;
+                state.streak = parsed.streak || 0;
+            }
+            applyBackground();
+            updateCoinDisplays();
+            checkDailyStreak();
+        }
+
+        function saveProgress() {
+            const toSave = { 
+                coins: state.coins, 
+                inventory: state.inventory, 
+                bgInventory: state.bgInventory,
+                equipped: state.equipped,
+                equippedBg: state.equippedBg,
+                achievements: state.achievements,
+                stats: state.stats,
+                highScores: state.highScores,
+                lastLogin: state.lastLogin,
+                streak: state.streak
+            };
+            localStorage.setItem('demonHuntersSaveMega', JSON.stringify(toSave));
+            updateCoinDisplays();
+        }
+
+        function checkDailyStreak() {
+            const today = new Date().toDateString();
+            if (state.lastLogin !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (state.lastLogin === yesterday.toDateString()) {
+                    state.streak++;
+                } else {
+                    state.streak = 1;
+                }
+                state.lastLogin = today;
+                
+                const reward = 50 * state.streak;
+                document.getElementById('daily-streak-count').innerText = state.streak;
+                document.getElementById('daily-reward-amount').innerText = reward;
+                
+                state.pendingReward = reward;
+                saveProgress();
+                openModal('daily-modal');
+            }
+        }
+
+        function claimDaily() {
+            if(state.pendingReward) {
+                state.coins += state.pendingReward;
+                state.pendingReward = 0;
+                saveProgress();
+                playSound('correct');
+            }
+            closeModal('daily-modal');
+        }
+
+        function updateCoinDisplays() {
+            document.getElementById('intro-coins').innerText = state.coins;
+            document.getElementById('shop-coins').innerText = state.coins;
+        }
+
+        function applyBackground() {
+            document.getElementById('main-body').className = `h-[100dvh] w-full flex items-center justify-center ${state.equippedBg}`;
+        }
+
+        // --- AUDIO & VOICE SYSTEM ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let musicInterval;
+        let hebrewVoice = null;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        // Voice Init
+        function initVoices() {
+            const voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) {
+                // Prioritize 'he-IL', then 'he', then 'iw'
+                hebrewVoice = voices.find(v => v.lang === 'he-IL') || 
+                              voices.find(v => v.lang === 'he') || 
+                              voices.find(v => v.lang === 'iw-IL') ||
+                              voices.find(v => v.lang.startsWith('he'));
+            }
+        }
+        window.speechSynthesis.onvoiceschanged = initVoices;
+
+        function toggleSpeech() {
+            state.isSpeechOn = !state.isSpeechOn;
+            const icon = document.getElementById('speech-icon');
+            icon.setAttribute('data-lucide', state.isSpeechOn ? 'mic' : 'mic-off');
+            
+            const btn = document.getElementById('speech-btn');
+            if(state.isSpeechOn) {
+                btn.classList.add('bg-pink-900', 'border-pink-400');
+                btn.classList.remove('bg-gray-800/80');
+                speak("הדיבוב מופעל");
+            } else {
+                btn.classList.remove('bg-pink-900', 'border-pink-400');
+                btn.classList.add('bg-gray-800/80');
+            }
+            
+            lucide.createIcons();
+            if (!hebrewVoice) initVoices();
+        }
+
+        function speak(text) {
+            if(!state.isSpeechOn && text !== "הדיבוב מופעל") return;
+            
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            
+            if(hebrewVoice) {
+                u.voice = hebrewVoice;
+            } else {
+                u.lang = 'he';
+            }
+            
+            window.speechSynthesis.speak(u);
+        }
+
+        function readMathQuestion(q) {
+            let spoken = q.replace(/\+/g, 'ועוד')
+                          .replace(/-/g, 'פחות')
+                          .replace(/×/g, 'כפול')
+                          .replace(/:/g, 'לחלק ל')
+                          .replace(/\?/g, 'כמה זה');
+            
+            if(q.includes('?')) {
+                 spoken = "מה המספר החסר? " + spoken.replace('כמה זה', '');
+            } else {
+                spoken = "כמה זה " + spoken + "?";
+            }
+            speak(spoken);
+        }
+
+        function showBossDialogue(text, duration=2000) {
+            const bubble = document.getElementById('boss-dialogue');
+            bubble.innerText = text;
+            bubble.classList.remove('hidden-screen');
+            speak(text);
+            setTimeout(() => bubble.classList.add('hidden-screen'), duration);
+        }
+
+        // --- MUSIC ---
+        function toggleMusic() {
+            initAudio();
+            state.isMusicOn = !state.isMusicOn;
+            const icon = document.getElementById('music-icon');
+            if(state.isMusicOn) {
+                icon.setAttribute('data-lucide', 'volume-2');
+                startMusicLoop();
+            } else {
+                icon.setAttribute('data-lucide', 'volume-x');
+                stopMusicLoop();
+            }
+            lucide.createIcons();
+        }
+
+        function startMusicLoop() {
+            if (musicInterval) clearInterval(musicInterval);
+            let beat = 0;
+            const tempo = 250; 
+            musicInterval = setInterval(() => {
+                if (!state.isMusicOn || !audioCtx || audioCtx.state === 'suspended') return;
+                const now = audioCtx.currentTime;
+                const bassFreqs = [55, 55, 110, 98, 55, 55, 65, 73]; 
+                const freq = bassFreqs[beat % 8];
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(freq, now);
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass'; filter.frequency.setValueAtTime(400, now);
+                osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+                if (beat % 2 !== 0) {
+                    const hatOsc = audioCtx.createOscillator(); const hatGain = audioCtx.createGain();
+                    hatOsc.type = 'square'; hatOsc.frequency.setValueAtTime(8000, now);
+                    hatOsc.connect(hatGain); hatGain.connect(audioCtx.destination);
+                    hatGain.gain.setValueAtTime(0.02, now); hatGain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    hatOsc.start(now); hatOsc.stop(now + 0.05);
+                }
+                beat++;
+            }, tempo);
+        }
+
+        function stopMusicLoop() {
+            if (musicInterval) clearInterval(musicInterval);
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+            if (type === 'correct') {
+                osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gainNode.gain.setValueAtTime(0.2, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'wrong') {
+                osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.linearRampToValueAtTime(100, now + 0.3);
+                gainNode.gain.setValueAtTime(0.3, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'boss_hit') {
+                osc.type = 'square'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.2);
+                gainNode.gain.setValueAtTime(0.4, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'boss_defeat') {
+                osc.type = 'triangle'; osc.frequency.setValueAtTime(400, now); osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                osc.frequency.linearRampToValueAtTime(1200, now + 0.4);
+                gainNode.gain.setValueAtTime(0.5, now); gainNode.gain.linearRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
+            }
+        }
+
+        // --- UI & NAVIGATION ---
+        function initIcons() { if (window.lucide) lucide.createIcons(); }
+
+        function showScreen(screenId) {
+            ['intro-screen', 'settings-screen', 'game-screen', 'report-screen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden-screen');
+                document.getElementById(id).classList.remove('flex');
+            });
+            const target = document.getElementById(screenId);
+            target.classList.remove('hidden-screen');
+            target.classList.add('flex');
+            setTimeout(initIcons, 50);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden-screen'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden-screen'); }
+
+        function goHome() {
+            clearInterval(state.intervalId);
+            stopMusicLoop();
+            closeModal('quit-modal');
+            showScreen('intro-screen');
+            loadProgress();
+        }
+
+        function confirmQuit() { goHome(); }
+
+        function goToSettings() {
+            initAudio();
+            const nameInput = document.getElementById('player-name');
+            if (!nameInput.value.trim()) {
+                nameInput.classList.add('ring-4', 'ring-red-500');
+                setTimeout(() => nameInput.classList.remove('ring-4', 'ring-red-500'), 500);
+                return;
+            }
+            state.name = nameInput.value;
+            setMode(state.gameMode);
+            showScreen('settings-screen');
+        }
+
+        function adjustTime(amount) {
+            state.timeLimit += amount;
+            if (state.timeLimit < 1) state.timeLimit = 1;
+            if (state.timeLimit > 10) state.timeLimit = 10;
+            const m = state.timeLimit.toString().padStart(2, '0');
+            document.getElementById('time-display').innerText = m;
+        }
+
+        function setMode(mode) {
+            state.gameMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('mode-btn-active'));
+            document.getElementById(`mode-btn-${mode}`).classList.add('mode-btn-active');
+        }
+
+        // --- SHOP & PURCHASES ---
+        function openShop() { loadProgress(); state.shopTab = 'chars'; renderShop(); openModal('shop-modal'); }
+        function switchShopTab(tab) {
+            state.shopTab = tab;
+            document.getElementById('tab-chars').className = `flex-1 py-2 rounded-lg font-bold text-sm ${tab==='chars' ? 'bg-pink-600 text-white' : 'bg-gray-700 text-gray-400'}`;
+            document.getElementById('tab-bgs').className = `flex-1 py-2 rounded-lg font-bold text-sm ${tab==='bgs' ? 'bg-pink-600 text-white' : 'bg-gray-700 text-gray-400'}`;
+            renderShop();
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('shop-grid');
+            grid.innerHTML = '';
+            const isChars = state.shopTab === 'chars';
+            const items = isChars ? charItems : bgItems;
+            
+            items.forEach(item => {
+                const inventory = isChars ? state.inventory : state.bgInventory;
+                const currentEquip = isChars ? state.equipped : state.equippedBg;
+                const owned = inventory.includes(item.id);
+                const equipped = currentEquip === item.id;
+                
+                const div = document.createElement('div');
+                div.className = `shop-item p-2 rounded-xl flex flex-col items-center gap-2 ${owned ? 'owned' : 'locked'} ${equipped ? 'equipped' : ''}`;
+                
+                let btnHtml = '';
+                if (equipped) {
+                    btnHtml = `<span class="text-cyan-400 font-bold text-xs">בשימוש</span>`;
+                } else if (owned) {
+                    btnHtml = `<button onclick="equipItem('${item.id}', '${state.shopTab}')" class="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1 rounded-lg">בחר</button>`;
+                } else {
+                    btnHtml = `<button onclick="askToBuy('${item.id}', '${state.shopTab}')" class="bg-yellow-600 hover:bg-yellow-500 text-white text-xs px-3 py-1 rounded-lg flex items-center gap-1">
+                        ${item.price} <i data-lucide="coins" class="w-3 h-3"></i>
+                    </button>`;
+                }
+
+                let visual = '';
+                if(isChars) visual = `<div class="w-16 h-16 rounded-full overflow-hidden border border-gray-500 bg-gray-900"><img src="${item.img}" class="w-full h-full object-cover"></div>`;
+                else visual = `<div class="w-16 h-16 rounded-lg border border-gray-500 ${item.class}"></div>`;
+
+                div.innerHTML = `${visual}<span class="font-bold text-sm text-center leading-none">${item.name}</span>${btnHtml}`;
+                grid.appendChild(div);
+            });
+            initIcons();
+        }
+
+        function askToBuy(id, type) {
+            const list = type === 'chars' ? charItems : bgItems;
+            const item = list.find(i => i.id === id);
+            state.pendingBuy = { item, type };
+            
+            const current = state.coins;
+            const price = item.price;
+            const diff = current - price;
+            
+            document.getElementById('buy-current').innerText = current;
+            document.getElementById('buy-price').innerText = `-${price}`;
+            
+            const row = document.getElementById('buy-result-row');
+            const label = document.getElementById('buy-result-label');
+            const val = document.getElementById('buy-remain');
+            const btn = document.getElementById('buy-confirm-btn');
+
+            if (current >= price) {
+                row.className = "flex justify-between font-bold text-green-400"; label.innerText = "יישאר:"; val.innerText = diff;
+                btn.disabled = false; btn.innerText = "קנה!"; btn.className = "flex-1 py-3 rounded-xl bg-yellow-600 hover:bg-yellow-500 text-black font-bold";
+            } else {
+                row.className = "flex justify-between font-bold text-red-500"; label.innerText = "חסר:"; val.innerText = Math.abs(diff);
+                btn.disabled = true; btn.innerText = "אין מספיק"; btn.className = "flex-1 py-3 rounded-xl bg-gray-700 text-gray-500 font-bold cursor-not-allowed";
+            }
+            openModal('buy-modal');
+        }
+
+        function confirmPurchase() {
+            if (!state.pendingBuy) return;
+            const { item, type } = state.pendingBuy;
+            state.coins -= item.price;
+            state.stats.itemsBought++;
+            if (type === 'chars') state.inventory.push(item.id);
+            else state.bgInventory.push(item.id);
+            if(state.stats.itemsBought >= 5) checkUnlock('collector');
+            saveProgress(); closeModal('buy-modal'); playSound('correct'); renderShop();
+            state.pendingBuy = null;
+        }
+
+        function equipItem(id, type) {
+            if (type === 'chars') state.equipped = id;
+            else { state.equippedBg = bgItems.find(b => b.id === id).class; applyBackground(); }
+            saveProgress(); renderShop();
+        }
+
+        // --- ACHIEVEMENTS & EXTRAS ---
+        function checkUnlock(id) {
+            if (!state.achievements.includes(id)) {
+                state.achievements.push(id);
+                showAchievementNotif(id);
+                saveProgress();
+            }
+        }
+
+        function showAchievementNotif(id) {
+            const achieve = achievementsList.find(a => a.id === id);
+            const notif = document.getElementById('achieve-notif');
+            document.getElementById('achieve-title').innerText = achieve.title;
+            notif.classList.remove('hidden-screen');
+            playSound('correct');
+            setTimeout(() => notif.classList.add('hidden-screen'), 3000);
+        }
+
+        function openAchievements() {
+            const list = document.getElementById('achievements-list');
+            list.innerHTML = '';
+            achievementsList.forEach(a => {
+                const unlocked = state.achievements.includes(a.id);
+                const el = document.createElement('div');
+                el.className = `achievement-card p-4 rounded-xl flex items-center gap-4 ${unlocked ? 'achievement-unlocked' : 'text-gray-500'}`;
+                el.innerHTML = `<div class="p-3 bg-black/30 rounded-full ${unlocked ? '' : 'grayscale-icon'}"><i data-lucide="${a.icon}" class="w-6 h-6"></i></div><div><div class="font-bold text-lg">${a.title}</div><div class="text-xs opacity-70">${a.desc}</div></div>${unlocked ? '<div class="mr-auto text-yellow-400 font-black">✓</div>' : '<div class="mr-auto text-xs">נעול</div>'}`;
+                list.appendChild(el);
+            });
+            initIcons(); openModal('achievements-modal');
+        }
+
+        function openHighScores() {
+            const list = document.getElementById('highscores-list');
+            list.innerHTML = '';
+            const scores = state.highScores.sort((a,b) => b.score - a.score).slice(0, 5);
+            if(scores.length === 0) list.innerHTML = '<p class="text-center text-gray-500">אין שיאים עדיין...</p>';
+            scores.forEach((s, idx) => {
+                const el = document.createElement('div');
+                el.className = 'bg-gray-800 p-3 rounded-lg flex justify-between items-center border border-gray-700';
+                el.innerHTML = `<div class="flex items-center gap-3"><span class="font-black text-xl text-gray-500">#${idx+1}</span><div><div class="font-bold text-white">${s.name}</div><div class="text-xs text-gray-400">${s.date}</div></div></div><div class="font-mono text-xl text-yellow-400 font-bold">${s.score}</div>`;
+                list.appendChild(el);
+            });
+            openModal('highscores-modal');
+        }
+
+        function showMistakes() {
+            const list = document.getElementById('mistakes-list');
+            list.innerHTML = '';
+            if (state.mistakes.length === 0) list.innerHTML = '<p class="text-center text-gray-400">אין טעויות! עבודה מושלמת!</p>';
+            else {
+                state.mistakes.forEach(m => {
+                    const item = document.createElement('div');
+                    item.className = 'mistake-item';
+                    item.innerHTML = `<div class="text-xl font-bold text-white mb-1" dir="ltr">${m.q}</div><div class="text-sm">ענית: <span class="text-red-400 font-bold">${m.user}</span> | נכון: <span class="text-green-400 font-bold">${m.correct}</span></div>`;
+                    list.appendChild(item);
+                });
+            }
+            openModal('mistakes-modal');
+        }
+
+        function spawnParticles(x, y) {
+            const container = document.getElementById('particles-container');
+            const colors = ['#ff00ff', '#00ffff', '#ffff00', '#ffffff'];
+            for(let i=0; i<12; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 8 + 4;
+                const color = colors[Math.floor(Math.random()*colors.length)];
+                const angle = Math.random() * Math.PI * 2;
+                const dist = Math.random() * 100 + 50;
+                const tx = Math.cos(angle) * dist + 'px';
+                const ty = Math.sin(angle) * dist + 'px';
+                p.style.width = size + 'px'; p.style.height = size + 'px';
+                p.style.backgroundColor = color;
+                p.style.left = x + 'px'; p.style.top = y + 'px';
+                p.style.setProperty('--tx', tx); p.style.setProperty('--ty', ty);
+                if(Math.random() > 0.5) p.style.borderRadius = '0';
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 800);
+            }
+        }
+
+        function spawnFloatingText(x, y, text) {
+            const el = document.createElement('div');
+            el.className = 'floating-text';
+            el.innerText = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
+
+        // --- GAME LOGIC ---
+        function startGame() {
+            state.score = 0; state.correctCount = 0; state.currentQuestion = 0;
+            state.timer = state.timeLimit * 60; state.isPaused = false;
+            state.combo = 0; state.isBossActive = false; state.mistakes = []; 
+            
+            document.getElementById('current-mode-title').innerText = modeNames[state.gameMode];
+            document.getElementById('lifeline-btn').classList.remove('opacity-50', 'pointer-events-none'); 
+
+            updateHUD();
+            showScreen('game-screen');
+            nextQuestion();
+            if(state.isMusicOn) startMusicLoop();
+
+            if (state.intervalId) clearInterval(state.intervalId);
+            state.intervalId = setInterval(() => {
+                if (state.isPaused) return;
+                state.timer--;
+                const m = Math.floor(state.timer / 60).toString().padStart(2, '0');
+                const s = (state.timer % 60).toString().padStart(2, '0');
+                document.getElementById('game-timer').innerText = `${m}:${s}`;
+                if (state.timer <= 0) finishGame();
+            }, 1000);
+        }
+
+        function useLifeline() {
+            if (state.isPaused) return;
+            if (state.coins < 50) { alert("אין מספיק מטבעות!"); return; }
+            const btn = document.getElementById('lifeline-btn');
+            btn.classList.add('opacity-50', 'pointer-events-none');
+            state.coins -= 50; saveProgress();
+            const buttons = Array.from(document.querySelectorAll('.option-btn'));
+            let wrongBtns = buttons.filter(b => b.dataset.correct === "false");
+            wrongBtns.sort(() => Math.random() - 0.5);
+            wrongBtns.slice(0, 2).forEach(b => b.classList.add('disabled-opt', 'bg-red-900/50', 'text-gray-500'));
+            playSound('correct');
+        }
+
+        function generateQuestionData() {
+            let num1, num2, answer, qText;
+            const mode = state.gameMode;
+            const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+            switch(mode) {
+                case 1: num1 = rand(1, 10); num2 = rand(1, 10); if (Math.random()>0.5) { qText=`${num1} + ${num2}`; answer=num1+num2; } else { if(num1<num2)[num1,num2]=[num2,num1]; qText=`${num1} - ${num2}`; answer=num1-num2; } break;
+                case 2: num1 = rand(1, 5); num2 = rand(1, 5); if (Math.random()>0.5) { qText=`${num1} × ${num2}`; answer=num1*num2; } else { const r=rand(1,5); const d=rand(1,5); qText=`${r*d} : ${d}`; answer=r; } break;
+                case 3: num1 = rand(1, 10); num2 = rand(1, 10); if (Math.random()>0.5) { qText=`${num1} × ${num2}`; answer=num1*num2; } else { const r=rand(1,10); const d=rand(1,10); qText=`${r*d} : ${d}`; answer=r; } break;
+                case 4: num1 = rand(10, 80); num2 = rand(5, 19); if (Math.random()>0.5) { qText=`${num1} + ${num2}`; answer=num1+num2; } else { qText=`${num1+num2} - ${num2}`; answer=num1; } break;
+                case 5: num1 = rand(1, 10); answer = rand(1, 10); qText = `? + ${num1} = ${answer+num1}`; break;
+                case 6: num1 = rand(5, 15); num2 = rand(1, 5); const num3 = rand(1, 5); qText = `${num1} - ${num2} + ${num3}`; answer = num1 - num2 + num3; break;
+            }
+
+            let options = new Set();
+            options.add(answer);
+            while(options.size < 4) {
+                let off = rand(-5, 5);
+                if (off===0) off=1;
+                let wrong = answer + off;
+                if (wrong < 0) wrong = 0;
+                options.add(wrong);
+            }
+            return { question: qText, answer: answer, options: Array.from(options).sort(()=>Math.random()-0.5) };
+        }
+
+        function updateHUD() {
+            document.getElementById('score-display').innerText = state.score;
+            document.getElementById('q-current').innerText = state.currentQuestion + 1;
+            const comboEl = document.getElementById('combo-container');
+            if (state.combo > 1) {
+                comboEl.classList.remove('opacity-0');
+                document.getElementById('combo-text').innerText = `x${state.combo} COMBO!`;
+                if(!state.isBossActive) document.getElementById('card-border').classList.add('combo-fire');
+            } else {
+                comboEl.classList.add('opacity-0');
+                document.getElementById('card-border').classList.remove('combo-fire');
+            }
+        }
+
+        function nextQuestion() {
+            if (state.currentQuestion >= state.totalQuestions) { finishGame(); return; }
+            state.questionStartTime = Date.now();
+
+            const isBossTrigger = (state.currentQuestion + 1 === 10 || state.currentQuestion + 1 === 20);
+            if (isBossTrigger && !state.isBossActive) {
+                state.isBossActive = true; state.bossHP = 3; 
+                showBossDialogue("חשבת שתנצחי אותי?");
+            }
+
+            const demon = document.getElementById('demon-container');
+            const cardBorder = document.getElementById('card-border');
+            const bossWarn = document.getElementById('boss-warning');
+            const imgEl = document.getElementById('char-image');
+            const hpBar = document.getElementById('boss-hp');
+            
+            demon.classList.remove('purified', 'shake', 'boss-damage');
+            demon.style.opacity = '1'; demon.style.transform = 'scale(1)';
+            document.getElementById('feedback-overlay').style.opacity = '0';
+            document.getElementById('char-flash').style.opacity = '0';
+
+            if (state.isBossActive) {
+                bossWarn.classList.remove('hidden-screen');
+                hpBar.classList.remove('hidden-screen');
+                cardBorder.classList.add('neon-border-red');
+                cardBorder.classList.remove('combo-fire');
+                const percent = (state.bossHP / state.bossMaxHP) * 100;
+                document.getElementById('boss-hp-fill').style.width = `${percent}%`;
+                imgEl.src = "https://api.dicebear.com/7.x/bottts/svg?seed=DemonBoss&backgroundColor=ff0000";
+            } else {
+                bossWarn.classList.add('hidden-screen');
+                hpBar.classList.add('hidden-screen');
+                cardBorder.classList.remove('neon-border-red');
+                const skin = charItems.find(i => i.id === state.equipped);
+                imgEl.src = skin ? skin.img : charItems[0].img;
+            }
+
+            const data = generateQuestionData();
+            document.getElementById('math-question').innerText = data.question;
+            
+            // Speak question if active
+            readMathQuestion(data.question);
+
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            data.options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn w-full h-full rounded-2xl text-3xl font-bold font-mono text-white shadow-lg active:scale-95 transition-transform flex items-center justify-center bg-white/10 border border-white/20 relative overflow-hidden';
+                btn.innerText = opt;
+                btn.dataset.correct = (opt === data.answer) ? "true" : "false"; 
+                
+                const handleEvent = (e) => { 
+                    e.preventDefault(); 
+                    let rect = btn.getBoundingClientRect();
+                    let x = rect.left + rect.width / 2;
+                    let y = rect.top + rect.height / 2;
+                    if(e.touches && e.touches[0]) { x = e.touches[0].clientX; y = e.touches[0].clientY; } 
+                    else if(e.clientX) { x = e.clientX; y = e.clientY; }
+                    handleAnswer(btn, opt, data.answer, x, y); 
+                };
+                btn.addEventListener('touchstart', handleEvent, {passive: false});
+                btn.addEventListener('click', handleEvent);
+                grid.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(btn, selected, correct, clickX, clickY) {
+            if (state.isPaused) return;
+            state.isPaused = true;
+
+            const diff = (Date.now() - state.questionStartTime) / 1000;
+            if(selected === correct && diff <= 2) checkUnlock('speed');
+
+            const demon = document.getElementById('demon-container');
+            const feedbackText = document.getElementById('feedback-text');
+            const overlay = document.getElementById('feedback-overlay');
+            const flash = document.getElementById('char-flash');
+
+            if (selected === correct) {
+                btn.classList.add('correct-answer');
+                spawnParticles(clickX, clickY); 
+                const points = 100 * (state.combo + 1);
+                spawnFloatingText(clickX, clickY, `+${points}`);
+
+                state.combo++;
+                state.score += points;
+                state.correctCount++;
+
+                if (state.isBossActive) {
+                    state.bossHP--;
+                    playSound('boss_hit');
+                    demon.classList.add('boss-damage');
+                    const percent = (state.bossHP / state.bossMaxHP) * 100;
+                    document.getElementById('boss-hp-fill').style.width = `${percent}%`;
+
+                    if (state.bossHP <= 0) {
+                        playSound('boss_defeat');
+                        state.score += 500;
+                        spawnFloatingText(clickX, clickY-50, "+500 BOSS!");
+                        state.isBossActive = false;
+                        state.stats.bossKills++;
+                        if(state.stats.bossKills >= 5) checkUnlock('boss_slayer');
+                        saveProgress();
+                        
+                        showBossDialogue("לאאא! אני עוד אחזור!");
+                        demon.classList.add('purified');
+                        feedbackText.innerText = "BOSS DEFEATED!";
+                        feedbackText.style.color = "#ffff00";
+                        speak("כל הכבוד! ניצחת את הבוס");
+                    } else {
+                        feedbackText.innerText = "BOSS HIT!";
+                        feedbackText.style.color = "#ffaa00";
+                    }
+                } else {
+                    playSound('correct');
+                    speak("מצוין!");
+                    demon.classList.add('purified');
+                    flash.style.opacity = '0.7'; setTimeout(() => flash.style.opacity = '0', 200);
+                    feedbackText.innerText = "NICE!";
+                    feedbackText.style.color = "#00ff00";
+                }
+                overlay.style.opacity = '1';
+
+            } else {
+                playSound('wrong');
+                speak("אוי לא...");
+                btn.classList.add('wrong-answer');
+                demon.classList.add('shake');
+                state.combo = 0;
+                const qText = document.getElementById('math-question').innerText;
+                state.mistakes.push({q: qText, user: selected, correct: correct});
+                document.querySelectorAll('.option-btn').forEach(b => { if (parseInt(b.innerText) === correct) b.classList.add('correct-answer'); });
+                feedbackText.innerText = "MISS!";
+                feedbackText.style.color = "#ff0000";
+                overlay.style.opacity = '1';
+            }
+            updateHUD();
+            setTimeout(() => {
+                if (!state.isBossActive) state.currentQuestion++;
+                state.isPaused = false;
+                nextQuestion();
+            }, 1200);
+        }
+
+        function finishGame() {
+            clearInterval(state.intervalId);
+            stopMusicLoop(); 
+            showScreen('report-screen');
+            document.getElementById('report-name').innerText = state.name;
+            document.getElementById('report-score-val').innerText = state.score;
+            const earned = Math.floor(state.score / 10);
+            state.coins += earned;
+            
+            const newScore = { name: state.name, score: state.score, date: new Date().toLocaleDateString('he-IL') };
+            state.highScores.push(newScore);
+            state.highScores.sort((a,b) => b.score - a.score);
+            state.highScores = state.highScores.slice(0, 5); 
+            
+            if(state.highScores[0] === newScore) {
+                document.getElementById('new-highscore-alert').classList.remove('hidden-screen');
+                speak("וואו! שיא חדש!");
+            } else {
+                document.getElementById('new-highscore-alert').classList.add('hidden-screen');
+            }
+
+            saveProgress();
+            document.getElementById('report-earned').innerText = `+${earned}`;
+            
+            const percent = Math.round((state.correctCount / state.totalQuestions) * 100);
+            let rank = "C-CLASS";
+            let color = "text-gray-400";
+            if (percent === 100) { rank = "LEGEND"; color = "text-pink-500 neon-text-pink"; }
+            else if (percent >= 90) { rank = "S-CLASS"; color = "text-cyan-400 neon-text-blue"; }
+            else if (percent >= 70) { rank = "A-CLASS"; color = "text-green-400"; }
+            const rankEl = document.getElementById('report-rank');
+            rankEl.innerText = rank;
+            rankEl.className = `text-5xl font-black ${color} drop-shadow-xl`;
+            const mistBtn = document.getElementById('mistakes-btn-container');
+            if (state.mistakes.length > 0) mistBtn.classList.remove('hidden-screen');
+            else mistBtn.classList.add('hidden-screen');
+        }
+
+        function resetGame() { showScreen('settings-screen'); }
+
+        async function shareResult() {
+            const text = `היי! ${state.name} השיגה ציון ${state.score} במשחק Demon Hunters!\nדרגה: ${document.getElementById('report-rank').innerText}`;
+            if (navigator.share) { try { await navigator.share({ title: 'Demon Hunters', text: text }); } catch (e) {} } else { navigator.clipboard.writeText(text).then(() => alert('הועתק!')); }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => { initIcons(); loadProgress(); initVoices(); });
+        showScreen('intro-screen');
+    </script>
+</body>
+</html>
