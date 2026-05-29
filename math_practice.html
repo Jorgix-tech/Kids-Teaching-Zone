@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 תרגול מתמטיקה ושעון</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Heebo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#fef9f0;--purple:#7c3aed;--pink:#ec4899;--teal:#0d9488;
+    --orange:#f97316;--green:#22c55e;--red:#ef4444;
+    --text:#1e1b4b;--muted:#6b7280;--shadow:0 4px 24px rgba(124,58,237,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Heebo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;direction:rtl;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 10% 20%,rgba(124,58,237,0.08) 0%,transparent 70%),radial-gradient(ellipse 50% 50% at 90% 80%,rgba(236,72,153,0.07) 0%,transparent 70%);pointer-events:none;z-index:0}
+  
+  /* Utilities */
+  .hidden { display: none !important; }
+  .screen { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 20px 16px; animation: fadeIn 0.4s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* Modals */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(30, 27, 75, 0.6); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 1; transition: opacity 0.3s; }
+  .modal-box { background: white; border-radius: 24px; padding: 32px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(1); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .modal-overlay.hide { opacity: 0; pointer-events: none; }
+  .modal-overlay.hide .modal-box { transform: scale(0.9); }
+  .modal-title { font-family: 'Fredoka One', cursive; font-size: 2rem; color: var(--purple); margin-bottom: 12px; }
+  .modal-text { font-size: 1.1rem; color: var(--muted); margin-bottom: 24px; }
+  .modal-input { width: 100%; border: 3px solid #e5e7eb; border-radius: 16px; padding: 14px 20px; font-family: 'Heebo', sans-serif; font-size: 1.2rem; font-weight: 700; text-align: center; margin-bottom: 20px; outline: none; transition: all 0.2s; }
+  .modal-input:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(124,58,237,0.1); }
+  .modal-btn { background: linear-gradient(135deg, var(--purple), var(--pink)); color: white; border: none; border-radius: 16px; padding: 14px 32px; font-family: 'Fredoka One', cursive; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; width: 100%; box-shadow: 0 4px 14px rgba(124,58,237,0.3); }
+  .modal-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(124,58,237,0.4); }
+  .modal-btn.secondary { background: #f3f4f6; color: var(--text); box-shadow: none; margin-top: 10px; font-family: 'Heebo', sans-serif; font-weight: 700; }
+  .modal-btn.secondary:hover { background: #e5e7eb; }
+  .modal-btn.danger { background: var(--red); box-shadow: 0 4px 14px rgba(239,68,68,0.3); }
+  .modal-btn.danger:hover { box-shadow: 0 8px 20px rgba(239,68,68,0.4); }
+
+  /* Home Screen */
+  .home-header { text-align: center; margin-bottom: 40px; }
+  .greeting { font-family: 'Fredoka One', cursive; font-size: clamp(2rem, 6vw, 3rem); color: var(--text); margin-bottom: 10px; }
+  .total-stars-badge { display: inline-flex; align-items: center; justify-content: center; background: white; padding: 10px 24px; border-radius: 50px; font-size: 1.5rem; font-weight: 900; color: #f59e0b; box-shadow: var(--shadow); gap: 8px; border: 2px solid #fef3c7; }
+  .total-stars-badge span { color: var(--text); font-size: 1.2rem; margin-right: 4px; }
+  
+  .topics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  .topic-card { background: white; border-radius: 24px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); border: 2px solid transparent; text-decoration: none; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .topic-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
+  .topic-card::before { content: ''; position: absolute; top: 0; right: 0; width: 100px; height: 100px; border-radius: 0 24px 0 100%; opacity: 0.1; }
+  
+  .topic-icon { font-size: 3rem; margin-bottom: 16px; transition: transform 0.3s; }
+  .topic-card:hover .topic-icon { transform: scale(1.1) rotate(5deg); }
+  .topic-title { font-family: 'Fredoka One', cursive; font-size: 1.4rem; color: var(--text); margin-bottom: 8px; }
+  .topic-desc { font-size: 1rem; color: var(--muted); font-weight: 600; }
+
+  .card-random { border-color: rgba(249,115,22,0.3); } .card-random::before { background: var(--orange); } .card-random .topic-title { color: var(--orange); }
+  .card-numbers { border-color: rgba(124,58,237,0.3); } .card-numbers::before { background: var(--purple); } .card-numbers .topic-title { color: var(--purple); }
+  .card-arithmetic { border-color: rgba(13,148,136,0.3); } .card-arithmetic::before { background: var(--teal); } .card-arithmetic .topic-title { color: var(--teal); }
+  .card-geometry { border-color: rgba(236,72,153,0.3); } .card-geometry::before { background: var(--pink); } .card-geometry .topic-title { color: var(--pink); }
+
+  .reset-area { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px dashed rgba(0,0,0,0.05); }
+  .reset-link { color: var(--muted); text-decoration: underline; cursor: pointer; font-weight: 600; font-size: 0.95rem; background: none; border: none; font-family: inherit; }
+  .reset-link:hover { color: var(--red); }
+
+  /* Game Screen Top Bar */
+  .game-top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .btn-home { display: flex; align-items: center; gap: 8px; background: white; border: none; border-radius: 14px; padding: 10px 20px; font-family: 'Heebo', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--purple); cursor: pointer; box-shadow: var(--shadow); transition: all 0.2s; }
+  .btn-home:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(124,58,237,0.2); background: #f5f3ff; }
+  .mini-stars { display: flex; align-items: center; gap: 6px; background: white; border-radius: 14px; padding: 10px 20px; font-weight: 800; font-size: 1.1rem; box-shadow: var(--shadow); color: #f59e0b; }
+
+  /* Existing Game Styles */
+  .score-bar{display:flex;justify-content:center;gap:16px;margin:0 0 24px;flex-wrap:wrap}
+  .score-pill{background:white;border-radius:50px;padding:8px 20px;font-weight:700;font-size:1rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:8px}
+  .score-pill .emoji{font-size:1.3rem}
+  #score-correct{color:var(--green)}
+  #score-wrong{color:var(--red)}
+  #score-streak{color:var(--orange)}
+  .topic-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:24px}
+  .tab-btn{border:none;border-radius:14px;padding:10px 18px;font-family:'Heebo',sans-serif;font-size:.92rem;font-weight:700;cursor:pointer;transition:all .18s;background:white;color:var(--muted);box-shadow:0 2px 8px rgba(0,0,0,0.08)}
+  .tab-btn.active{color:white;transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,0.18)}
+  .tab-btn[data-topic="random"].active{background:var(--orange)}
+  .tab-btn[data-topic="numbers"].active{background:var(--purple)}
+  .tab-btn[data-topic="arithmetic"].active{background:var(--teal)}
+  .tab-btn[data-topic="geometry"].active{background:var(--pink)}
+  
+  .question-card{background:white;border-radius:24px;padding:32px 28px;box-shadow:var(--shadow);margin-bottom:20px;position:relative;overflow:hidden;animation:slideIn .3s ease}
+  @keyframes slideIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .question-card::before{content:'';position:absolute;top:0;right:0;width:120px;height:120px;border-radius:0 24px 0 100%;opacity:.08}
+  .card-numbers::before{background:var(--purple)}
+  .card-arithmetic::before{background:var(--teal)}
+  .card-geometry::before{background:var(--pink)}
+  .q-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;opacity:.6}
+  .q-text{font-size:clamp(1.1rem,3vw,1.35rem);font-weight:700;line-height:1.5;margin-bottom:18px;color:var(--text)}
+  .q-hint{font-size:.88rem;color:var(--muted);margin-bottom:16px;font-style:italic; background: #f3f4f6; display: inline-block; padding: 6px 12px; border-radius: 8px;}
+  .q-visual{background:#f8f5ff;border-radius:14px;padding:14px 12px;margin-bottom:18px;text-align:center}
+  .q-visual svg{max-width:100%;height:auto;display:inline-block}
+  .answers-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  
+  .ans-btn{border:2.5px solid #e5e7eb;border-radius:14px;padding:14px 16px;font-family:'Heebo',sans-serif;font-size:1.05rem;font-weight:600;cursor:pointer;transition:all .18s;background:white;text-align:center;line-height:1.4}
+  .ans-btn:hover:not(:disabled){border-color:var(--purple);background:#f5f3ff;transform:translateY(-2px);box-shadow:0 4px 12px rgba(124,58,237,0.15)}
+  .ans-btn.correct{background:#dcfce7 !important;border-color:var(--green) !important;color:#15803d; transform:scale(1.02); z-index:10;}
+  .ans-btn.wrong{background:#fee2e2 !important;border-color:var(--red) !important;color:#b91c1c; animation: shake 0.4s;}
+  .ans-btn:disabled{cursor:default; opacity: 0.7;}
+  .ans-btn:disabled.correct, .ans-btn:disabled.wrong { opacity: 1; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .open-answer{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .open-input{flex:1;min-width:120px;border:2.5px solid #e5e7eb;border-radius:12px;padding:12px 16px;font-family:'Heebo',sans-serif;font-size:1.2rem;font-weight:700;text-align:center;outline:none;transition:border-color .18s}
+  .open-input:focus{border-color:var(--purple)}
+  .open-input.correct{border-color:var(--green);background:#dcfce7; color:#15803d;}
+  .open-input.wrong{border-color:var(--red);background:#fee2e2; color:#b91c1c; animation: shake 0.4s;}
+  
+  .submit-btn{background:var(--purple);color:white;border:none;border-radius:12px;padding:12px 24px;font-family:'Heebo',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .18s}
+  .submit-btn:hover{background:#6d28d9;transform:translateY(-1px); box-shadow: 0 4px 12px rgba(124,58,237,0.3);}
+  
+  .feedback{margin-top:18px;padding:14px 18px;border-radius:12px;font-size:1.1rem;font-weight:600;display:none;animation:popIn .3s cubic-bezier(0.34, 1.56, 0.64, 1)}
+  @keyframes popIn{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+  .feedback.show{display:block}
+  .feedback.correct-fb{background:#dcfce7;color:#15803d;border:2px solid #86efac}
+  .feedback.wrong-fb{background:#fee2e2;color:#b91c1c;border:2px solid #fca5a5}
+  
+  .next-btn{display:none;width:100%;margin-top:20px;background:linear-gradient(135deg,var(--purple),var(--pink));color:white;border:none;border-radius:16px;padding:16px;font-family:'Fredoka One',cursive;font-size:1.3rem;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(124,58,237,0.3)}
+  .next-btn.show{display:block}
+  .next-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(124,58,237,0.35)}
+  
+  .confetti-container{position:fixed;inset:0;pointer-events:none;z-index:900;overflow:hidden}
+  .confetti-piece{position:absolute;width:10px;height:10px;border-radius:2px;animation:fall linear forwards}
+  @keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+  
+  .streak-badge{position:fixed;top:20px;left:50%;transform:translateX(-50%) scale(0);background:var(--orange);color:white;padding:12px 28px;border-radius:50px;font-family:'Fredoka One',cursive;font-size:1.4rem;z-index:950;transition:transform .4s cubic-bezier(.34,1.56,.64,1);box-shadow:0 8px 24px rgba(249,115,22,0.4)}
+  .streak-badge.show{transform:translateX(-50%) scale(1)}
+
+  /* Animations for Stars */
+  .star-anim { display: inline-block; animation: starPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes starPop { 0% { transform: scale(1); } 50% { transform: scale(1.5) rotate(15deg); color: #fbbf24; } 100% { transform: scale(1); } }
+
+  @media(max-width:480px){
+    .question-card{padding:22px 16px}
+    .answers-grid{grid-template-columns:1fr}
+    .game-top-bar { flex-direction: column; align-items: stretch; }
+    .btn-home { justify-content: center; }
+    .mini-stars { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="confetti-container" id="confetti"></div>
+<div class="streak-badge" id="streak-badge">🔥 רצף!</div>
+
+<!-- Name Registration Modal -->
+<div id="nameModal" class="modal-overlay hide">
+  <div class="modal-box">
+    <div class="modal-title">ברוכים הבאים! 👋</div>
+    <div class="modal-text">איזה כיף שבאתם לתרגל. איך קוראים לך?</div>
+    <input type="text" id="studentNameInput" class="modal-input" placeholder="לכתוב כאן את השם..." onkeydown="if(event.key==='Enter') saveName()">
+    <button class="modal-btn" onclick="saveName()">בואו נתחיל! 🚀</button>
+  </div>
+</div>
+
+<!-- Reset Confirmation Modal -->
+<div id="resetModal" class="modal-overlay hide">
+  <div class="modal-box">
+    <div class="modal-title">להחליף משתמש? 🔄</div>
+    <div class="modal-text">הפעולה תאפס את הכוכבים ותאפשר לילד/ה אחר/ת להיכנס. למחוק את הנתונים?</div>
+    <button class="modal-btn danger" onclick="confirmReset()">כן, למחוק ולהתחיל מחדש</button>
+    <button class="modal-btn secondary" onclick="closeResetModal()">לא, טעות שלי</button>
+  </div>
+</div>
+
+<!-- HOME SCREEN -->
+<div id="homeScreen" class="screen">
+  <div class="home-header">
+    <div class="greeting">שלום, <span id="display-name" style="color:var(--purple);"></span>! ✨</div>
+    <div class="total-stars-badge">
+      <span id="home-total-stars">0</span> ⭐ <span>כוכבים!</span>
+    </div>
+  </div>
+
+  <div class="topics-grid">
+    <a onclick="launchGame('random')" class="topic-card card-random">
+      <div class="topic-icon">🎲</div>
+      <div class="topic-title">הכל מעורב</div>
+      <div class="topic-desc">מבדק של כל הנושאים יחד</div>
+    </a>
+    <a onclick="launchGame('numbers')" class="topic-card card-numbers">
+      <div class="topic-icon">🔢</div>
+      <div class="topic-title">הכרת מספרים</div>
+      <div class="topic-desc">מבנה העשרוני, קריאה וכתיבה</div>
+    </a>
+    <a onclick="launchGame('arithmetic')" class="topic-card card-arithmetic">
+      <div class="topic-icon">➕</div>
+      <div class="topic-title">פעולות חשבון</div>
+      <div class="topic-desc">חיבור, חיסור, כפל וסדר פעולות</div>
+    </a>
+    <a onclick="launchGame('geometry')" class="topic-card card-geometry">
+      <div class="topic-icon">📐</div>
+      <div class="topic-title">גאומטריה</div>
+      <div class="topic-desc">זוויות, היקף וזיהוי צורות</div>
+    </a>
+  </div>
+
+  <div class="reset-area">
+    <button class="reset-link" onclick="openResetModal()">החלפת משתמש / איפוס נתונים ⚙️</button>
+  </div>
+</div>
+
+<!-- GAME SCREEN -->
+<div id="gameScreen" class="screen hidden">
+  
+  <div class="game-top-bar">
+    <button class="btn-home" onclick="goHome()">🏠 חזרה לראשי</button>
+    <div class="mini-stars">
+      <span id="game-total-stars">0</span> ⭐ בסך הכל
+    </div>
+  </div>
+
+  <div class="score-bar">
+    <div class="score-pill"><span class="emoji">✅</span> נכון: <span id="score-correct">0</span></div>
+    <div class="score-pill"><span class="emoji">❌</span> טעות: <span id="score-wrong">0</span></div>
+    <div class="score-pill"><span class="emoji">🔥</span> רצף: <span id="score-streak">0</span></div>
+  </div>
+
+  <div class="topic-tabs">
+    <button class="tab-btn" data-topic="random" onclick="setTopic('random',this)">🎲 הכל מעורב</button>
+    <button class="tab-btn" data-topic="numbers" onclick="setTopic('numbers',this)">🔢 מספרים</button>
+    <button class="tab-btn" data-topic="arithmetic" onclick="setTopic('arithmetic',this)">➕ חשבון</button>
+    <button class="tab-btn" data-topic="geometry" onclick="setTopic('geometry',this)">📐 גאומטריה</button>
+  </div>
+
+  <div id="question-area"></div>
+</div>
+
+<script>
+// --- STATE MANAGEMENT & LOCAL STORAGE ---
+const STORAGE_PREFIX = 'mathAppPro_';
+let studentName = localStorage.getItem(STORAGE_PREFIX + 'name') || '';
+let totalStars = parseInt(localStorage.getItem(STORAGE_PREFIX + 'stars')) || 0;
+
+let correct=0, wrong=0, streak=0;
+let currentTopic='random', currentQ=null, answered=false, recentQIds=[];
+
+// Initialization
+window.onload = function() {
+  if (!studentName) {
+    document.getElementById('nameModal').classList.remove('hide');
+    document.getElementById('studentNameInput').focus();
+  } else {
+    updateGlobalUI();
+  }
+};
+
+// Modals Logic
+function saveName() {
+  const input = document.getElementById('studentNameInput').value.trim();
+  if (input === '') return;
+  studentName = input;
+  localStorage.setItem(STORAGE_PREFIX + 'name', studentName);
+  document.getElementById('nameModal').classList.add('hide');
+  updateGlobalUI();
+}
+
+function openResetModal() {
+  document.getElementById('resetModal').classList.remove('hide');
+}
+
+function closeResetModal() {
+  document.getElementById('resetModal').classList.add('hide');
+}
+
+function confirmReset() {
+  localStorage.removeItem(STORAGE_PREFIX + 'name');
+  localStorage.removeItem(STORAGE_PREFIX + 'stars');
+  window.location.reload();
+}
+
+function updateGlobalUI() {
+  document.getElementById('display-name').textContent = studentName;
+  document.getElementById('home-total-stars').textContent = totalStars;
+  document.getElementById('game-total-stars').textContent = totalStars;
+}
+
+// Navigation
+function launchGame(topic) {
+  document.getElementById('homeScreen').classList.add('hidden');
+  document.getElementById('gameScreen').classList.remove('hidden');
+  
+  // Reset session scores
+  correct = 0; wrong = 0; streak = 0;
+  updateScoreUI();
+
+  // Find the right tab button and trigger it
+  const tabBtn = document.querySelector(`.tab-btn[data-topic="${topic}"]`);
+  if(tabBtn) {
+    setTopic(topic, tabBtn);
+  }
+}
+
+function goHome() {
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('homeScreen').classList.remove('hidden');
+  updateGlobalUI();
+}
+
+// --- GAME LOGIC & SVG GENERATORS ---
+function svgAngle(deg,color){
+  var r=70,cx=90,cy=88,rad=deg*Math.PI/180;
+  var x3=cx+r*Math.cos(-rad),y3=cy+r*Math.sin(-rad);
+  var arcR=30,ax=cx+arcR*Math.cos(-rad/2),ay=cy+arcR*Math.sin(-rad/2);
+  var rm=deg===90?'<polyline points="'+(cx+16)+','+cy+' '+(cx+16)+','+(cy-16)+' '+cx+','+(cy-16)+'" fill="none" stroke="'+color+'" stroke-width="2.5"/>':'';
+  var ap=deg!==90?'<path d="M '+(cx+arcR)+' '+cy+' A '+arcR+' '+arcR+' 0 '+(deg>180?1:0)+' 0 '+x3.toFixed(1)+' '+y3.toFixed(1)+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-dasharray="4,2"/>':'';
+  return '<svg width="180" height="120" viewBox="0 0 180 120"><line x1="'+cx+'" y1="'+cy+'" x2="'+(cx+r)+'" y2="'+cy+'" stroke="#374151" stroke-width="3" stroke-linecap="round"/><line x1="'+cx+'" y1="'+cy+'" x2="'+x3.toFixed(1)+'" y2="'+y3.toFixed(1)+'" stroke="#374151" stroke-width="3" stroke-linecap="round"/>'+rm+ap+'<text x="'+ax.toFixed(1)+'" y="'+(ay-4).toFixed(1)+'" text-anchor="middle" font-size="15" font-weight="bold" fill="'+color+'">'+deg+'°</text></svg>';
+}
+function svgSquare(side){
+  var s=100,ox=55,oy=10;
+  var lbl=side==='?'?'?':side+' ס"מ';
+  return '<svg width="220" height="140" viewBox="0 0 220 140"><rect x="'+ox+'" y="'+oy+'" width="'+s+'" height="'+s+'" fill="#ede9fe" stroke="#7c3aed" stroke-width="3" rx="2"/><polyline points="'+(ox+9)+','+oy+' '+(ox+9)+','+(oy+9)+' '+ox+','+(oy+9)+'" fill="none" stroke="#7c3aed" stroke-width="2"/><polyline points="'+(ox+s-9)+','+oy+' '+(ox+s-9)+','+(oy+9)+' '+(ox+s)+','+(oy+9)+'" fill="none" stroke="#7c3aed" stroke-width="2"/><polyline points="'+(ox+9)+','+(oy+s)+' '+(ox+9)+','+(oy+s-9)+' '+ox+','+(oy+s-9)+'" fill="none" stroke="#7c3aed" stroke-width="2"/><polyline points="'+(ox+s-9)+','+(oy+s)+' '+(ox+s-9)+','+(oy+s-9)+' '+(ox+s)+','+(oy+s-9)+'" fill="none" stroke="#7c3aed" stroke-width="2"/><text x="'+(ox+s/2)+'" y="'+(oy+s+18)+'" text-anchor="middle" font-size="13" font-weight="bold" fill="#7c3aed">'+lbl+'</text><text x="'+(ox-18)+'" y="'+(oy+s/2+5)+'" text-anchor="middle" font-size="13" font-weight="bold" fill="#7c3aed">'+lbl+'</text></svg>';
+}
+function svgRect(wLabel,hLabel,wide){
+  var rw=wide?130:85,rh=wide?78:98,ox=42,oy=10;
+  return '<svg width="230" height="140" viewBox="0 0 230 140"><rect x="'+ox+'" y="'+oy+'" width="'+rw+'" height="'+rh+'" fill="#cffafe" stroke="#0d9488" stroke-width="3" rx="2"/><polyline points="'+(ox+9)+','+oy+' '+(ox+9)+','+(oy+9)+' '+ox+','+(oy+9)+'" fill="none" stroke="#0d9488" stroke-width="2"/><polyline points="'+(ox+rw-9)+','+oy+' '+(ox+rw-9)+','+(oy+9)+' '+(ox+rw)+','+(oy+9)+'" fill="none" stroke="#0d9488" stroke-width="2"/><polyline points="'+(ox+9)+','+(oy+rh)+' '+(ox+9)+','+(oy+rh-9)+' '+ox+','+(oy+rh-9)+'" fill="none" stroke="#0d9488" stroke-width="2"/><polyline points="'+(ox+rw-9)+','+(oy+rh)+' '+(ox+rw-9)+','+(oy+rh-9)+' '+(ox+rw)+','+(oy+rh-9)+'" fill="none" stroke="#0d9488" stroke-width="2"/><text x="'+(ox+rw/2)+'" y="'+(oy+rh+18)+'" text-anchor="middle" font-size="13" font-weight="bold" fill="#0d9488">'+wLabel+'</text><text x="'+(ox-20)+'" y="'+(oy+rh/2+5)+'" text-anchor="middle" font-size="13" font-weight="bold" fill="#0d9488">'+hLabel+'</text></svg>';
+}
+function svgRhombus(){
+  return '<svg width="200" height="125" viewBox="0 0 200 125"><polygon points="100,16 165,60 100,104 35,60" fill="#fce7f3" stroke="#ec4899" stroke-width="3"/><line x1="100" y1="16" x2="100" y2="104" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.4"/><line x1="35" y1="60" x2="165" y2="60" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="5,3" opacity="0.4"/><text x="100" y="118" text-anchor="middle" font-size="12" fill="#6b7280">4 צלעות שוות</text></svg>';
+}
+function svgFourShapes(){
+  return '<svg width="310" height="108" viewBox="0 0 310 108" style="direction:ltr"><rect x="6" y="18" width="58" height="58" fill="#ede9fe" stroke="#7c3aed" stroke-width="2.5" rx="2"/><text x="35" y="92" text-anchor="middle" font-size="11" fill="#7c3aed" font-weight="bold">ריבוע</text><rect x="84" y="26" width="78" height="50" fill="#cffafe" stroke="#0d9488" stroke-width="2.5" rx="2"/><text x="123" y="92" text-anchor="middle" font-size="11" fill="#0d9488" font-weight="bold">מלבן</text><polygon points="202,18 258,52 202,86 146,52" fill="#fce7f3" stroke="#ec4899" stroke-width="2.5"/><text x="202" y="102" text-anchor="middle" font-size="11" fill="#ec4899" font-weight="bold">מעוין</text><polygon points="268,28 302,28 292,78 258,78" fill="#fef9c3" stroke="#f97316" stroke-width="2.5"/><text x="280" y="100" text-anchor="middle" font-size="11" fill="#f97316" font-weight="bold">טרפז</text></svg>';
+}
+
+function makeQuestions(){
+  var qs=[];
+  qs.push(
+    {id:'n1',topic:'numbers',type:'mc',text:'מה המספר שווה?\n3,025',hint:'קראי: אלפים, מאות, עשרות, אחדות',options:['שלושה אלפים ועשרים וחמש','שלושים ואלפיים וחמש','שלוש מאות ועשרים וחמש','שלושת אלפים ומאתיים וחמש'],correct:0},
+    {id:'n2',topic:'numbers',type:'mc',text:'איזה מספר מתאים?\nשבעה אלפים, ארבע מאות ושנים עשר',options:['7,142','7,412','7,421','74,12'],correct:1},
+    {id:'n3',topic:'numbers',type:'mc',text:'כמה שווה הספרה 6 במספר 2,641?',hint:'בדקי: אחדות? עשרות? מאות? אלפים?',options:['6','60','600','6,000'],correct:2},
+    {id:'n4',topic:'numbers',type:'mc',text:'כמה שווה הספרה 4 במספר 4,892?',options:['4','40','400','4,000'],correct:3},
+    {id:'n5',topic:'numbers',type:'mc',text:'כמה שווה הספרה 3 במספר 1,305?',options:['3','30','300','3,000'],correct:2},
+    {id:'n6',topic:'numbers',type:'mc',text:'המספר 5,000 + 200 + 30 + 7 שווה:',options:['5,237','52,037','5,327','5,273'],correct:0},
+    {id:'n7',topic:'numbers',type:'mc',text:'המספר 9,008 בפירוק עשרוני:',options:['9,000+8','9,000+80','900+8','9,000+800+8'],correct:0},
+    {id:'n8',topic:'numbers',type:'mc',text:'המספר 3,500 על ישר המספרים בין 3,000 ל-4,000:',options:['בין 3,000 ל-3,250','בדיוק באמצע','קרוב ל-4,000','קרוב ל-3,000'],correct:1},
+    {id:'n9',topic:'numbers',type:'open',text:'כתבי במספרים:\nשמונת אלפים ומאה ושלושה עשר',answer:'8113'},
+    {id:'n10',topic:'numbers',type:'open',text:'מה המספר?\n6,000 + 500 + 4 = ?',answer:'6504'},
+    {id:'n11',topic:'numbers',type:'mc',text:'מי הגדול ביותר?',options:['4,099','4,900','4,009','4,990'],correct:3},
+    {id:'n12',topic:'numbers',type:'mc',text:'מי הקטן ביותר?',options:['3,100','3,010','3,001','3,110'],correct:2},
+    {id:'n13',topic:'numbers',type:'mc',text:'המספר 2,060 בפירוק נכון:',options:['2,000+60','2,000+600','200+60','20+60'],correct:0},
+    {id:'n14',topic:'numbers',type:'open',text:'כמה אלפים, מאות, עשרות ואחדות ב-7,362?\n(כתבי 4 הספרות ברצף)',answer:'7362'}
+  );
+  var multPairs=[[6,6],[6,7],[6,8],[6,9],[7,7],[7,8],[7,9],[8,8],[8,9],[9,9]];
+  multPairs.forEach(function(p){qs.push({id:'mt'+p[0]+'x'+p[1],topic:'arithmetic',type:'open',text:'לוח הכפל:\n'+p[0]+' × '+p[1]+' = ?',answer:''+(p[0]*p[1])});});
+  qs.push(
+    {id:'a1',topic:'arithmetic',type:'open',text:'חשבי:\n2,345 + 1,432 = ?',answer:'3777'},
+    {id:'a2',topic:'arithmetic',type:'open',text:'חשבי:\n5,678 - 2,345 = ?',answer:'3333'},
+    {id:'a3',topic:'arithmetic',type:'open',text:'חשבי (עם המרה):\n3,756 + 2,478 = ?',answer:'6234'},
+    {id:'a4',topic:'arithmetic',type:'open',text:'חשבי (עם המרה):\n7,203 - 4,568 = ?',answer:'2635'},
+    {id:'a5',topic:'arithmetic',type:'open',text:'חשבי:\n4,000 - 1 = ?',answer:'3999'},
+    {id:'m1',topic:'arithmetic',type:'open',text:'חשבי:\n234 × 3 = ?',answer:'702'},
+    {id:'m2',topic:'arithmetic',type:'open',text:'חשבי:\n125 × 4 = ?',answer:'500'},
+    {id:'m3',topic:'arithmetic',type:'open',text:'חשבי:\n312 × 5 = ?',answer:'1560'},
+    {id:'m4',topic:'arithmetic',type:'open',text:'חשבי:\n205 × 7 = ?',answer:'1435'},
+    {id:'m6',topic:'arithmetic',type:'open',text:'חשבי:\n23 × 14 = ?',answer:'322'},
+    {id:'m7',topic:'arithmetic',type:'open',text:'חשבי:\n31 × 22 = ?',answer:'682'},
+    {id:'m8',topic:'arithmetic',type:'open',text:'חשבי:\n45 × 12 = ?',answer:'540'},
+    {id:'m10',topic:'arithmetic',type:'open',text:'חשבי:\n47 × 10 = ?',answer:'470'},
+    {id:'m11',topic:'arithmetic',type:'open',text:'חשבי:\n36 × 100 = ?',answer:'3600'},
+    {id:'m12',topic:'arithmetic',type:'open',text:'חשבי:\n25 × 20 = ?',answer:'500'},
+    {id:'m13',topic:'arithmetic',type:'open',text:'חשבי:\n13 × 300 = ?',answer:'3900'},
+    {id:'o1',topic:'arithmetic',type:'open',text:'סדר פעולות:\n3 + 4 × 5 = ?',hint:'כפל לפני חיבור!',answer:'23'},
+    {id:'o2',topic:'arithmetic',type:'open',text:'סדר פעולות:\n(3 + 4) × 5 = ?',hint:'סוגריים קודם!',answer:'35'},
+    {id:'o3',topic:'arithmetic',type:'open',text:'סדר פעולות:\n20 - 2 × 6 = ?',hint:'כפל לפני חיסור!',answer:'8'},
+    {id:'o4',topic:'arithmetic',type:'open',text:'סדר פעולות:\n(20 - 2) × 6 = ?',answer:'108'},
+    {id:'o5',topic:'arithmetic',type:'open',text:'סדר פעולות:\n5 × 3 + 4 × 2 = ?',answer:'23'},
+    {id:'o6',topic:'arithmetic',type:'mc',text:'מה התוצאה?\n12 ÷ 4 + 3 × 2 = ?',options:['9','15','12','18'],correct:1},
+    {id:'w1',topic:'arithmetic',type:'mc',text:'בחנות יש 3 מדפים. בכל מדף 24 ספרים. כמה ספרים בסך הכל?',options:['27','72','62','82'],correct:1},
+    {id:'w2',topic:'arithmetic',type:'mc',text:'לדנה היו 1,250 מדבקות. היא נתנה לחברות 378. כמה נשאר לה?',options:['872','982','862','972'],correct:0},
+    {id:'w3',topic:'arithmetic',type:'mc',text:'ריצה של 5 ק"מ × 7 ימים. כמה ק"מ בשבוע?',options:['12','30','35','40'],correct:2},
+    {id:'w4',topic:'arithmetic',type:'mc',text:'קנינו 8 קופסאות. בכל קופסא 25 ממתקים. כמה ממתקים סה"כ?',options:['33','200','180','220'],correct:1}
+  );
+  qs.push(
+    {id:'g1',topic:'geometry',type:'mc',svg:svgAngle(90,'#7c3aed'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:1},
+    {id:'g2',topic:'geometry',type:'mc',svg:svgAngle(45,'#ec4899'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:0},
+    {id:'g3',topic:'geometry',type:'mc',svg:svgAngle(120,'#f97316'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:2},
+    {id:'g4',topic:'geometry',type:'mc',svg:svgAngle(180,'#0d9488'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:3},
+    {id:'g4b',topic:'geometry',type:'mc',svg:svgAngle(30,'#7c3aed'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:0},
+    {id:'g4c',topic:'geometry',type:'mc',svg:svgAngle(150,'#ec4899'),text:'איזו זווית רואים בציור?',options:['זווית חדה','זווית ישרה','זווית קהה','זווית שטוחה'],correct:2},
+    {id:'g5',topic:'geometry',type:'mc',svg:svgSquare('?'),text:'מה הצורה בציור?',options:['מלבן – 2 זוגות צלעות שוות','ריבוע – 4 צלעות שוות וזוויות ישרות','מעוין – אין לו זוויות ישרות','טרפז'],correct:1},
+    {id:'g6',topic:'geometry',type:'mc',svg:svgRect('9 ס"מ','5 ס"מ',true),text:'מה הצורה בציור?',options:['ריבוע – 4 צלעות שוות','מלבן – זוגות צלעות שוות וזוויות ישרות','מעוין','טרפז'],correct:1},
+    {id:'g7',topic:'geometry',type:'mc',svg:svgFourShapes(),text:'הסתכלי על 4 הצורות. איזו היא הריבוע?',options:['הצורה הסגולה (ריבוע)','הצורה הירוקה (מלבן)','הצורה הורודה (מעוין)','הצורה הכתומה (טרפז)'],correct:0},
+    {id:'g8',topic:'geometry',type:'mc',svg:svgRhombus(),text:'מה הצורה בציור?',options:['ריבוע','מלבן','מעוין – 4 צלעות שוות, זוויות לא בהכרח ישרות','טרפז'],correct:2},
+    {id:'g9',topic:'geometry',type:'open',svg:svgSquare('7'),text:'חשבי את ההיקף של הריבוע (ס"מ):',hint:'היקף = צלע × 4',answer:'28'},
+    {id:'g10',topic:'geometry',type:'open',svg:svgRect('9 ס"מ','5 ס"מ',true),text:'חשבי את ההיקף של המלבן (ס"מ):',hint:'היקף = (אורך + רוחב) × 2',answer:'28'},
+    {id:'g11',topic:'geometry',type:'open',svg:svgSquare('?'),text:'היקף הריבוע = 36 ס"מ. מה אורך כל צלע? (ס"מ)',hint:'צלע = היקף ÷ 4',answer:'9'},
+    {id:'g10b',topic:'geometry',type:'open',svg:svgRect('6 ס"מ','4 ס"מ',true),text:'חשבי את ההיקף של המלבן (ס"מ):',hint:'היקף = (אורך + רוחב) × 2',answer:'20'},
+    {id:'g12',topic:'geometry',type:'mc',text:'מה ארוך יותר: 3 מטר או 250 ס"מ?',options:['3 מטר (= 300 ס"מ)','250 ס"מ','שניהם שווים','אי אפשר להשוות'],correct:0},
+    {id:'g13',topic:'geometry',type:'mc',svg:svgFourShapes(),text:'איזו צורה מהציור היא תמיד גם מלבן?',options:['מעוין','מקבילית','ריבוע','טרפז'],correct:2},
+    {id:'g14',topic:'geometry',type:'mc',text:'הזווית במשולש שווה-צלעות שווה:',options:['90°','45°','60°','30°'],correct:2}
+  );
+  return qs;
+}
+
+var allQuestions=makeQuestions();
+
+function setTopic(topic,btn){
+  currentTopic=topic;
+  document.querySelectorAll('.tab-btn').forEach(function(b){b.classList.remove('active')});
+  btn.classList.add('active');
+  recentQIds=[];
+  loadQuestion();
+}
+function getFiltered(){return currentTopic==='random'?allQuestions:allQuestions.filter(function(q){return q.topic===currentTopic});}
+
+function pickQuestion(){
+  var pool=getFiltered();
+  var avail=pool.filter(function(q){return recentQIds.indexOf(q.id)<0});
+  var chosen=avail.length>0?avail:pool;
+  var q=chosen[Math.floor(Math.random()*chosen.length)];
+  recentQIds.push(q.id);
+  if(recentQIds.length>Math.min(8,pool.length-1))recentQIds.shift();
+  return q;
+}
+
+var topicLabels={numbers:'🔢 הכרת מספרים',arithmetic:'➕ פעולות חשבון',geometry:'📐 גאומטריה'};
+var topicCols={numbers:'#7c3aed',arithmetic:'#0d9488',geometry:'#ec4899'};
+
+function loadQuestion(){
+  answered=false;
+  currentQ=pickQuestion();
+  var area=document.getElementById('question-area');
+  var label=topicLabels[currentQ.topic];
+  var color=topicCols[currentQ.topic];
+  var txt=currentQ.text.replace(/\n/g,'<br>');
+  var hintH=currentQ.hint?'<div class="q-hint">💡 רמז: '+currentQ.hint+'</div>':'';
+  var svgH=currentQ.svg?'<div class="q-visual">'+currentQ.svg+'</div>':'';
+  var inputH='';
+  
+  if(currentQ.type==='mc'){
+    var opts=currentQ.options.map(function(o,i){return '<button class="ans-btn" onclick="checkMC('+i+',this)">'+o+'</button>';}).join('');
+    inputH=hintH+'<div class="answers-grid">'+opts+'</div>';
+  } else {
+    inputH=hintH+'<div class="open-answer"><input class="open-input" id="open-input" type="text" inputmode="numeric" placeholder="תשובה..." onkeydown="if(event.key===\'Enter\')checkOpen()"><button class="submit-btn" onclick="checkOpen()">בדקי! ✓</button></div>';
+  }
+  
+  area.innerHTML='<div class="question-card card-'+currentQ.topic+'"><div class="q-label" style="color:'+color+'">'+label+'</div><div class="q-text">'+txt+'</div>'+svgH+inputH+'<div class="feedback" id="feedback"></div><button class="next-btn" id="next-btn" onclick="loadQuestion()">השאלה הבאה ➜</button></div>';
+  
+  if(currentQ.type==='open') setTimeout(function(){var el=document.getElementById('open-input');if(el)el.focus();},100);
+}
+
+function updateScoreUI() {
+  document.getElementById('score-correct').textContent=correct;
+  document.getElementById('score-wrong').textContent=wrong;
+  document.getElementById('score-streak').textContent=streak;
+}
+
+function checkMC(sel,btn){
+  if(answered)return;
+  answered=true;
+  var ok=sel===currentQ.correct;
+  document.querySelectorAll('.ans-btn').forEach(function(b,i){
+    b.disabled=true;
+    if(i===currentQ.correct)b.classList.add('correct');
+    else if(i===sel&&!ok)b.classList.add('wrong');
+  });
+  showFeedback(ok,currentQ.options[currentQ.correct]);
+}
+
+function checkOpen(){
+  if(answered)return;
+  var input=document.getElementById('open-input');
+  var val=input.value.trim().replace(/,/g,'').replace(/\s/g,'');
+  if(!val)return;
+  var exp=currentQ.answer.replace(/,/g,'').replace(/\s/g,'');
+  var ok=val===exp;
+  answered=true;
+  input.disabled=true;
+  input.classList.add(ok?'correct':'wrong');
+  showFeedback(ok,currentQ.answer);
+}
+
+function showFeedback(ok,ans){
+  var fb=document.getElementById('feedback');
+  var nb=document.getElementById('next-btn');
+  
+  if(ok){
+    correct++; streak++;
+    
+    // Add a star to total!
+    totalStars++;
+    localStorage.setItem(STORAGE_PREFIX + 'stars', totalStars);
+    
+    // Animate star counter
+    const starCounters = [document.getElementById('home-total-stars'), document.getElementById('game-total-stars')];
+    starCounters.forEach(el => {
+      el.textContent = totalStars;
+      el.classList.remove('star-anim');
+      void el.offsetWidth; // trigger reflow
+      el.classList.add('star-anim');
+    });
+
+    fb.className='feedback show correct-fb';
+    fb.innerHTML=getOkMsg();
+    if(streak%3===0)spawnConfetti();
+    if(streak>=3)showStreakBadge();
+  } else {
+    wrong++; streak=0;
+    fb.className='feedback show wrong-fb';
+    fb.innerHTML='❌ לא נורא, ממשיכים ללמוד! התשובה היא: <strong>'+ans+'</strong>';
+  }
+  
+  updateScoreUI();
+  nb.classList.add('show');
+}
+
+function getOkMsg(){
+  var m=['✅ מצוין! כל הכבוד! 🌟','✅ יפה מאוד! ממשיכים! 💪','✅ נכון מאה אחוז! 🎉','✅ מעולה! הרווחת כוכב! ⭐','✅ תשובה מושלמת! 🏆','✅ איזה אלופים! 🦋'];
+  return m[Math.floor(Math.random()*m.length)];
+}
+
+function spawnConfetti(){
+  var cols=['#7c3aed','#ec4899','#f97316','#22c55e','#fbbf24','#0d9488'];
+  var c=document.getElementById('confetti');
+  for(var i=0;i<35;i++){
+    var p=document.createElement('div');
+    p.className='confetti-piece';
+    p.style.cssText='left:'+Math.random()*100+'%;background:'+cols[Math.floor(Math.random()*cols.length)]+';width:'+(6+Math.random()*8)+'px;height:'+(6+Math.random()*8)+'px;border-radius:'+(Math.random()>.5?'50%':'2px')+';animation-duration:'+(1.2+Math.random()*1.5)+'s;animation-delay:'+(Math.random()*.3)+'s;';
+    c.appendChild(p);
+    setTimeout(function(){p.remove();},3000);
+  }
+}
+
+function showStreakBadge(){
+  var b=document.getElementById('streak-badge');
+  b.textContent='🔥 רצף של '+streak+'! מדהים!';
+  b.classList.add('show');
+  setTimeout(function(){b.classList.remove('show');},2500);
+}
+</script>
+</body>
+</html>
