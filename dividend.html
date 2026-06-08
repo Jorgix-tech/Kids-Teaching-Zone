@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 אלופות השאריות</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f0fdf4; }
+        .modal-overlay { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        .bounce-in { animation: bounceIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .correct-ans { background-color: #22c55e !important; color: white !important; border-color: #16a34a !important; animation: pulse 1s infinite; }
+        .wrong-ans { background-color: #ef4444 !important; color: white !important; border-color: #dc2626 !important; }
+        .fade-out { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-4">
+
+    <header class="w-full max-w-2xl flex justify-between items-center mb-8 bg-white p-4 rounded-2xl shadow-sm">
+        <h1 class="text-2xl font-bold text-green-600 cursor-pointer" onclick="showHome()">🌟 אלופות השאריות</h1>
+        <div class="flex items-center gap-4">
+            <div class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl font-bold text-lg">
+                ⭐ <span id="star-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-6 min-h-[400px] relative">
+        
+        <div id="screen-home" class="flex flex-col items-center gap-6">
+            <h2 id="greeting" class="text-3xl font-bold text-gray-800 mb-4">שלום! 👋</h2>
+            <p class="text-gray-600 text-center text-lg mb-4">בואי נתרגל חילוק עם שארית. בחרי רמה:</p>
+            
+            <div class="grid grid-cols-1 w-full gap-4">
+                <button onclick="startGame(1)" class="p-6 bg-blue-100 border-2 border-blue-400 rounded-2xl text-xl font-bold text-blue-800 hover:bg-blue-200 transition-all shadow-sm">
+                    🌱 רמה 1: מתחילים (עד 30)
+                </button>
+                <button onclick="startGame(2)" class="p-6 bg-purple-100 border-2 border-purple-400 rounded-2xl text-xl font-bold text-purple-800 hover:bg-purple-200 transition-all shadow-sm">
+                    🚀 רמה 2: מתקדמים (עד 50)
+                </button>
+                <button onclick="startGame(3)" class="p-6 bg-orange-100 border-2 border-orange-400 rounded-2xl text-xl font-bold text-orange-800 hover:bg-orange-200 transition-all shadow-sm">
+                    👑 רמה 3: אלופים (עד 100)
+                </button>
+            </div>
+            
+            <button onclick="openResetModal()" class="mt-8 text-sm text-gray-400 hover:text-red-500 underline">החלפת משתמש / איפוס נתונים</button>
+        </div>
+
+        <div id="screen-game" class="hidden flex flex-col items-center w-full">
+            <button onclick="showHome()" class="self-start mb-4 text-green-600 font-bold hover:text-green-800 flex items-center gap-2">
+                🏠 חזרה לראשי
+            </button>
+            
+            <h3 id="level-title" class="text-xl font-bold text-gray-500 mb-6">רמה 1</h3>
+            
+            <div dir="ltr" class="text-5xl font-bold text-gray-800 mb-6 tracking-widest bg-gray-50 p-6 rounded-2xl border-2 border-gray-100 shadow-inner w-full text-center" id="question-text">
+                25 ÷ 4 = ?
+            </div>
+
+            <div id="explanation-box" class="hidden w-full bg-blue-50 border-2 border-blue-200 p-4 rounded-xl text-center mb-6 shadow-sm">
+                <p id="explanation-text" class="text-blue-800 font-medium text-lg leading-relaxed"></p>
+                <button onclick="generateQuestion()" class="mt-4 bg-blue-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors shadow-md">הבנתי, לשאלה הבאה!</button>
+            </div>
+
+            <div id="answers-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mb-6">
+                </div>
+
+        </div>
+
+    </main>
+
+    <div id="modal-welcome" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 shadow-2xl bounce-in text-center">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">ברוכה הבאה! 🎉</h2>
+            <p class="text-gray-600 mb-6">איך קוראים לך?</p>
+            <input type="text" id="username-input" class="w-full border-2 border-green-300 rounded-xl p-3 text-center text-xl font-bold mb-6 focus:outline-none focus:border-green-500" placeholder="הקלידי שם כאן...">
+            <button onclick="saveName()" class="w-full bg-green-500 text-white text-xl font-bold py-3 rounded-xl hover:bg-green-600 transition-colors">בואי נתחיל! 🚀</button>
+        </div>
+    </div>
+
+    <div id="modal-reset" class="fixed inset-0 modal-overlay hidden flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-3xl max-w-md w-full mx-4 shadow-2xl bounce-in text-center">
+            <h2 class="text-2xl font-bold text-red-600 mb-4">איפוס נתונים ⚠️</h2>
+            <p class="text-gray-600 mb-6">האם את בטוחה שאת רוצה למחוק את השם והכוכבים?</p>
+            <div class="flex gap-4 justify-center">
+                <button onclick="closeResetModal()" class="px-6 py-2 bg-gray-200 text-gray-800 font-bold rounded-xl hover:bg-gray-300 transition-colors">ביטול</button>
+                <button onclick="confirmReset()" class="px-6 py-2 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors">כן, לאפס</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let userName = '';
+        let stars = 0;
+        let currentLevel = 1;
+        let currentCorrectAns = {};
+        let isAnswered = false;
+
+        // Initialize
+        window.onload = () => {
+            loadData();
+            if (!userName) {
+                document.getElementById('modal-welcome').classList.remove('hidden');
+            } else {
+                updateUI();
+            }
+        };
+
+        // Data Management
+        function loadData() {
+            userName = localStorage.getItem('mathRem_userName') || '';
+            stars = parseInt(localStorage.getItem('mathRem_stars')) || 0;
+        }
+
+        function saveData() {
+            localStorage.setItem('mathRem_userName', userName);
+            localStorage.setItem('mathRem_stars', stars);
+            updateUI();
+        }
+
+        function saveName() {
+            const input = document.getElementById('username-input').value.trim();
+            if (input) {
+                userName = input;
+                saveData();
+                document.getElementById('modal-welcome').classList.add('hidden');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('greeting').innerText = `שלום, ${userName}! 👋`;
+            document.getElementById('star-count').innerText = stars;
+        }
+
+        // Navigation
+        function showHome() {
+            document.getElementById('screen-home').classList.remove('hidden');
+            document.getElementById('screen-game').classList.add('hidden');
+            document.getElementById('explanation-box').classList.add('hidden');
+        }
+
+        // Modals
+        function openResetModal() { document.getElementById('modal-reset').classList.remove('hidden'); }
+        function closeResetModal() { document.getElementById('modal-reset').classList.add('hidden'); }
+        function confirmReset() {
+            localStorage.removeItem('mathRem_userName');
+            localStorage.removeItem('mathRem_stars');
+            location.reload();
+        }
+
+        // Game Logic
+        function startGame(level) {
+            currentLevel = level;
+            document.getElementById('screen-home').classList.add('hidden');
+            document.getElementById('screen-game').classList.remove('hidden');
+            document.getElementById('level-title').innerText = `רמה ${level}`;
+            generateQuestion();
+        }
+
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function generateQuestion() {
+            isAnswered = false;
+            document.getElementById('explanation-box').classList.add('hidden');
+            
+            let dividend, divisor, quotient, remainder;
+            let isValid = false;
+
+            while (!isValid) {
+                if (currentLevel === 1) {
+                    dividend = getRandomInt(10, 30);
+                    divisor = getRandomInt(2, 5);
+                } else if (currentLevel === 2) {
+                    dividend = getRandomInt(20, 50);
+                    divisor = getRandomInt(3, 7);
+                } else {
+                    dividend = getRandomInt(30, 100);
+                    divisor = getRandomInt(4, 9);
+                }
+
+                remainder = dividend % divisor;
+                // Make sure there is always a remainder for this specific app
+                if (remainder !== 0) {
+                    quotient = Math.floor(dividend / divisor);
+                    isValid = true;
+                }
+            }
+
+            // עדכון התרגיל (יוצג LTR בגלל ההגדרה ב-HTML)
+            document.getElementById('question-text').innerText = `${dividend} ÷ ${divisor} = ?`;
+            
+            currentCorrectAns = { q: quotient, r: remainder, div: divisor, did: dividend };
+            
+            // Generate options
+            let options = [
+                { q: quotient, r: remainder, correct: true },
+                { q: quotient, r: remainder + 1, correct: false },
+                { q: quotient + 1, r: remainder > 1 ? remainder - 1 : 1, correct: false },
+                { q: quotient - 1 > 0 ? quotient - 1 : quotient + 2, r: remainder, correct: false }
+            ];
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('answers-grid');
+            grid.innerHTML = '';
+            
+            options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'answer-btn p-4 bg-white border-2 border-gray-200 rounded-xl text-lg font-bold text-gray-700 hover:border-green-400 hover:bg-green-50 transition-all';
+                btn.innerText = `תוצאה: ${opt.q} | שארית: ${opt.r}`;
+                btn.onclick = () => checkAnswer(opt.correct, btn);
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(isCorrect, selectedBtn) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const allBtns = document.querySelectorAll('.answer-btn');
+            
+            if (isCorrect) {
+                selectedBtn.classList.add('correct-ans');
+                stars += 1;
+                saveData();
+                setTimeout(generateQuestion, 1200); // Next question automatically if correct
+            } else {
+                selectedBtn.classList.add('wrong-ans');
+                allBtns.forEach(btn => {
+                    if (btn.innerText.includes(`תוצאה: ${currentCorrectAns.q}`) && btn.innerText.includes(`שארית: ${currentCorrectAns.r}`)) {
+                        btn.classList.add('correct-ans');
+                    } else if (btn !== selectedBtn) {
+                        btn.classList.add('fade-out'); // מעמעם את שאר התשובות
+                    }
+                });
+
+                // Show Explanation with LTR math formatting
+                const expBox = document.getElementById('explanation-box');
+                const expText = document.getElementById('explanation-text');
+                
+                let multiplication = currentCorrectAns.q * currentCorrectAns.div;
+                
+                expText.innerHTML = `
+                    שימי לב: הכי קרוב ל-${currentCorrectAns.did} שמתחלק ב-${currentCorrectAns.div} הוא <strong>${multiplication}</strong> 
+                    <span dir="ltr" class="inline-block">(${currentCorrectAns.q} × ${currentCorrectAns.div})</span>.<br>
+                    השארית היא מה שנשאר: 
+                    <span dir="ltr" class="inline-block font-bold text-red-600 bg-red-100 px-2 rounded">${currentCorrectAns.did} - ${multiplication} = ${currentCorrectAns.r}</span>.
+                `;
+                expBox.classList.remove('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
